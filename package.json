@@ -27,7 +27,8 @@
       ],
       "post-commit": [],
       "pre-push": [
-        "npm test"
+        "mix credo --strict",
+        "mix test"
       ],
       "post-checkout": [],
       "post-merge": []
