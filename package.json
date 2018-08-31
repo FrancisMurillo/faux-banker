@@ -1,0 +1,51 @@
+{
+  "name": "faux_banker",
+  "version": "1.0.0",
+  "description": "To start your Phoenix server:",
+  "scripts": {
+    "lint-staged": "lint-staged",
+    "jsonlint": "jsonlint",
+    "prettier": "prettier",
+    "test": "mix test"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "jsonlint": "^1.6.3",
+    "lint-staged": "^7.2.2",
+    "prettier": "^1.14.2",
+    "pre-git": "^3.17.1"
+  },
+  "config": {
+    "pre-git": {
+      "enabled": true,
+      "allow-untracked-files": true,
+      "pre-commit": [
+        "mix format",
+        "npm run lint-staged"
+      ],
+      "post-commit": [],
+      "pre-push": [
+        "npm test"
+      ],
+      "post-checkout": [],
+      "post-merge": []
+    }
+  },
+  "lint-staged": {
+    "linters": {
+      "*.{ex,exs}": [
+        "mix format",
+        "git add"
+      ],
+      "*.json": [
+        "jsonlint -i",
+        "git add"
+      ]
+    }
+  },
+  "release": {
+    "analyzeCommits": "simple-commit-message"
+  }
+}
