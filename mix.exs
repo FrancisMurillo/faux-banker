@@ -33,6 +33,7 @@ defmodule FauxBanker.Mixfile do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:bcrypt_elixir, "~> 1.0"},
       {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false},
       {:guardian, "~> 1.0"},
       {:phoenix, "~> 1.3.4"},
@@ -41,6 +42,8 @@ defmodule FauxBanker.Mixfile do
       {:postgrex, ">= 0.0.0"},
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
+      {:ueberauth, "~> 0.4"},
+      {:ueberauth_identity, "~> 0.2"},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"}
     ]
