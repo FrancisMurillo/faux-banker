@@ -27,6 +27,9 @@ defmodule FauxBankerWeb.ConnCase do
   end
 
   setup tags do
+    {:ok, _} = Application.ensure_all_started(:ecto)
+    {:ok, _} = Application.ensure_all_started(:faux_banker)
+
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(FauxBanker.Repo)
 
     unless tags[:async] do

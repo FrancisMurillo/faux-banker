@@ -15,6 +15,7 @@ config :logger, :console,
   metadata: [:user_id]
 
 config :ueberauth, Ueberauth,
+  base_path: "/auth",
   providers: [
     identity:
       {Ueberauth.Strategy.Identity,
@@ -22,5 +23,12 @@ config :ueberauth, Ueberauth,
          callback_methods: ["POST"]
        ]}
   ]
+
+config :faux_banker, FauxBanker.Guardian,
+  allowed_algos: ["HS512"],
+  issuer: "faux_banker",
+  secret_key:
+    "4/hIFod6yIPz2OqsjS1NyX9m2H/dx2DC2MvGEySb/0aNa8nwShAvxyMkbadswpbI",
+  token_module: Guardian.Token.Jwt
 
 import_config "#{Mix.env()}.exs"

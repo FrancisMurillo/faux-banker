@@ -1,11 +1,13 @@
-# Script for populating the database. You can run it as:
-#
-#     mix run priv/repo/seeds.exs
-#
-# Inside the script, you can read and write to any of your
-# repositories directly:
-#
-#     FauxBanker.Repo.insert!(%FauxBanker.SomeSchema{})
-#
-# We recommend using the bang functions (`insert!`, `update!`
-# and so on) as they will fail if something goes wrong.
+alias Comeonin.Bcrypt, as: Comeonin
+
+import FauxBanker.Factory
+
+{:ok, _} = Application.ensure_all_started(:faux_banker)
+
+:user
+|> insert(%{
+  username: "manager",
+  email: "manager@email.com",
+  role: :manager,
+  password_hash: Comeonin.hashpwsalt("123456")
+})

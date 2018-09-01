@@ -1,66 +1,75 @@
 defmodule FauxBanker.AccountsTest do
   use FauxBanker.DataCase
 
-  alias FauxBanker.Accounts
+  alias Comeonin.Bcrypt, as: Comeonin
+  alias Ecto.Changeset
 
-  describe "users" do
-    alias FauxBanker.Accounts.User
+  import FauxBanker.Factory
 
-    @valid_attrs %{}
-    @update_attrs %{}
-    @invalid_attrs %{}
+  alias FauxBanker.Accounts, as: Context
+  alias Context.User
 
-    def user_fixture(attrs \\ %{}) do
-      {:ok, user} =
-        attrs
-        |> Enum.into(@valid_attrs)
-        |> Accounts.create_user()
+  describe "Context.register_client/1" do
+    @tag :positive
+    test "should work and only once" do
+      params = string_params_for(:user, %{})
 
-      user
+      assert {:ok, %User{role: :client}} = Context.register_client(params)
+      assert {:error, %Changeset{}} = Context.register_client(params)
     end
 
-    test "list_users/0 returns all users" do
-      user = user_fixture()
-      assert Accounts.list_users() == [user]
+    @tag :negative
+    test "should fail safely" do
+      assert {:error, %Changeset{}} = Context.register_client(%{})
+    end
+  end
+
+  describe "Context.find_user_by_authentication/1" do
+    setup do
+      %{
+        user:
+          :user
+          |> insert(%{
+            password: "123456",
+            password_hash: Comeonin.hashpwsalt("123456")
+          })
+      }
     end
 
-    test "get_user!/1 returns the user with given id" do
-      user = user_fixture()
-      assert Accounts.get_user!(user.id) == user
-    end
+    @tag :positive
+    @tag :negative
+    @tag :wip
+    test "should work and fail safely", %{
+      user: %User{id: id, username: username, email: email, password: password}
+    } do
+      assert {:error, :invalid_auth} = Context.find_user_by_authentication(%{})
 
-    test "create_user/1 with valid data creates a user" do
-      assert {:ok, %User{} = user} = Accounts.create_user(@valid_attrs)
-    end
+      assert {:error, :invalid_auth} =
+               Context.find_user_by_authentication(%{username: username})
 
-    test "create_user/1 with invalid data returns error changeset" do
-      assert {:error, %Ecto.Changeset{}} = Accounts.create_user(@invalid_attrs)
-    end
+      assert {:error, :invalid_auth} =
+               Context.find_user_by_authentication(%{email: email})
 
-    test "update_user/2 with valid data updates the user" do
-      user = user_fixture()
-      assert {:ok, user} = Accounts.update_user(user, @update_attrs)
-      assert %User{} = user
-    end
+      assert {:error, :invalid_auth} =
+               Context.find_user_by_authentication(%{password: email})
 
-    test "update_user/2 with invalid data returns error changeset" do
-      user = user_fixture()
+      assert {:error, :invalid_auth} =
+               Context.find_user_by_authentication(%{
+                 username: username,
+                 email: email
+               })
 
-      assert {:error, %Ecto.Changeset{}} =
-               Accounts.update_user(user, @invalid_attrs)
+      assert {:ok, %User{id: ^id}} =
+               Context.find_user_by_authentication(%{
+                 email: email,
+                 password: password
+               })
 
-      assert user == Accounts.get_user!(user.id)
-    end
-
-    test "delete_user/1 deletes the user" do
-      user = user_fixture()
-      assert {:ok, %User{}} = Accounts.delete_user(user)
-      assert_raise Ecto.NoResultsError, fn -> Accounts.get_user!(user.id) end
-    end
-
-    test "change_user/1 returns a user changeset" do
-      user = user_fixture()
-      assert %Ecto.Changeset{} = Accounts.change_user(user)
+      assert {:ok, %User{id: ^id}} =
+               Context.find_user_by_authentication(%{
+                 username: username,
+                 password: password
+               })
     end
   end
 end
