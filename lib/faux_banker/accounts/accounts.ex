@@ -8,7 +8,7 @@ defmodule FauxBanker.Accounts do
 
   alias FauxBanker.Repo
 
-  alias FauxBanker.Accounts.User
+  alias Context.User
 
   defmodule Queries do
     @moduledoc false

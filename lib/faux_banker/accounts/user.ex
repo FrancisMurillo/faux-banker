@@ -1,4 +1,6 @@
 defmodule FauxBanker.Accounts.User do
+  @moduledoc nil
+
   alias __MODULE__, as: Entity
 
   use Ecto.Schema

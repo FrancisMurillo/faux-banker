@@ -1,0 +1,14 @@
+<table class='table table-sm table-striped table-hover'>
+  <thead class='thead-dark'>
+    <tr>
+      <th scope='col'>Client</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%= for client <- clients() do %>
+    <tr>
+      <td><%= client.first_name <> " " <> client.last_name %></td>
+    </tr>
+    <% end %>
+  </tbody>
+</table>

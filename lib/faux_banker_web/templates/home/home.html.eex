@@ -16,3 +16,7 @@
     </li>
   </ul>
 </nav>
+
+<%= render FauxBankerWeb.LayoutView, "alert.html", assigns %>
+
+<%= render "manager_home.html", assigns %>
