@@ -34,23 +34,25 @@ defmodule FauxBanker.Accounts.User do
       :phone_number,
       :password
     ])
-    |> validate_required([:email, :role])
     |> unique_constraint(:username)
     |> unique_constraint(:email)
   end
 
   def register_client_changeset(%Entity{} = user, attrs) do
-    user
-    |> changeset(attrs)
-    |> put_change(:role, :client)
-    |> validate_required([
+    fields = [
       :username,
       :email,
       :first_name,
       :last_name,
       :phone_number,
       :password
-    ])
+    ]
+
+    user
+    |> cast(attrs, fields)
+    |> validate_required(fields)
+    |> unique_constraint(:username)
+    |> unique_constraint(:email)
     |> prepare_changes(fn changeset ->
       password_hash =
         changeset
@@ -59,6 +61,7 @@ defmodule FauxBanker.Accounts.User do
 
       changeset
       |> put_change(:password_hash, password_hash)
+      |> cast(%{role: :client}, [:role])
     end)
   end
 end

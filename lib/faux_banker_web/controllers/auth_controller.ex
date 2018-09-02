@@ -34,6 +34,8 @@ defmodule FauxBankerWeb.AuthController do
         |> redirect(to: "/")
 
       {:error, %Changeset{} = changeset} ->
+        changeset |> IO.inspect(label: "change")
+
         conn
         |> put_flash(:error, "Invalid data.")
         |> render("register_client.html")

@@ -21,7 +21,7 @@
 
   <div class='control-group'>
     <label class='control-label' for='phone-input'>Phone</label>
-    <input class='form-control' type='tel' name='phone' value='<%= @conn.params["phone_number"] %>' />
+    <input class='form-control' type='tel' name='phone_number' value='<%= @conn.params["phone_number"] %>' />
   </div>
 
   <div class='control-group'>
@@ -30,11 +30,6 @@
   </div>
 
   <div class='control-group'>
-    <label class='control-label' for='password-confirmation-input'>Confirm Password</label>
-    <input class='form-control' type='password' name='password_confirmation' />
-  </div>
-
-  <div class='control-group'>
-    <button class='btn btn-primary'>Login</button>
+    <button class='btn btn-primary'>Register</button>
   </div>
 <% end %>

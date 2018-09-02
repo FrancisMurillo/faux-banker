@@ -21,8 +21,8 @@ defmodule FauxBanker.Mixfile do
     ]
   end
 
-  defp elixirc_paths(_), do: ["lib", "test/support", "support"]
   defp elixirc_paths(:prod), do: ["lib"]
+  defp elixirc_paths(_), do: ["lib", "test/support", "support"]
 
   defp deps do
     [
