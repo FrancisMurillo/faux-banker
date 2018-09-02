@@ -38,14 +38,10 @@ defmodule FauxBanker.Accounts do
   end
 
   def get_user_by_email(email),
-    do:
-      User
-      |> Repo.get_by(email: email)
+    do: Repo.get_by(User, email: email)
 
   def get_user(id),
-    do:
-      User
-      |> Repo.get_by(email: id)
+    do: Repo.get(User, id)
 
   # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   def find_user_by_authentication(%{} = attrs) do

@@ -10,6 +10,7 @@ defmodule FauxBanker.AccountsFactory do
       def user_factory,
         do: %User{
           id: Generator.id(),
+          code: Generator.code(),
           username: Generator.username(),
           password: Generator.password(),
           password_hash: Generator.hashed_password(),

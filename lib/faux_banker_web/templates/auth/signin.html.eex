@@ -1,4 +1,6 @@
-<%= form_tag @form_url, method: "post" do %>
+<%= form_tag auth_path(@conn, :callback), method: "post" do %>
+  <p class="h1">Faux Banker</p>
+
   <div class='control-group'>
     <label class='control-label' for='email-input'>Email</label>
     <input class='form-control' type='email' name='email' />
@@ -7,6 +9,13 @@
   <div class='control-group'>
     <label class='control-label' for='password-input'>Password</label>
     <input class='form-control' type='password' name='password' />
+  </div>
+
+  <div class='control-group'>
+    <a href='<%= auth_path(@conn, :register_client_form) %>' class='btn btn-secondary tabindex='-1' role='button'
+       aria-disabled='true'>
+      Register Client
+    </a>
   </div>
 
   <div class='control-group'>

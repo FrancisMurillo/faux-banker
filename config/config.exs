@@ -29,6 +29,7 @@ config :faux_banker, FauxBanker.Guardian,
   issuer: "faux_banker",
   secret_key:
     "4/hIFod6yIPz2OqsjS1NyX9m2H/dx2DC2MvGEySb/0aNa8nwShAvxyMkbadswpbI",
-  token_module: Guardian.Token.Jwt
+  token_module: Guardian.Token.Jwt,
+  error_handler: FauxBankerWeb.AuthErrorHandler
 
 import_config "#{Mix.env()}.exs"

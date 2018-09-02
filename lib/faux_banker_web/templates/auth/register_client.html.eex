@@ -1,4 +1,6 @@
 <%= form_tag auth_path(@conn, :register_client), method: "post" do %>
+  <p class="h1">Client Registration</p>
+
   <div class='control-group'>
     <label class='control-label' for='email-input'>Email</label>
     <input class='form-control' type='email' name='email' value='<%= @conn.params["email"] %>' />
@@ -27,6 +29,13 @@
   <div class='control-group'>
     <label class='control-label' for='password-input'>Password</label>
     <input class='form-control' type='password' name='password' />
+  </div>
+
+  <div class='control-group'>
+    <a href='<%= auth_path(@conn, :signin_form) %>' class='btn btn-secondary tabindex='-1' role='button'
+       aria-disabled='true'>
+      Back
+    </a>
   </div>
 
   <div class='control-group'>

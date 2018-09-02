@@ -14,23 +14,16 @@ defmodule FauxBankerWeb.AuthController do
   alias FauxBanker.Accounts, as: Context
   alias FauxBanker.Accounts.User
 
-  def index(conn, _params) do
-    render(conn, "index.html", users: [])
-  end
-
-  def request(conn, _params) do
-    render(conn, "request.html", callback_url: Helpers.callback_url(conn))
-  end
-
   def register_client_form(conn, _params) do
     render(conn, "register_client.html")
   end
 
   def register_client(conn, params) do
     case Context.register_client(params) do
-      {:ok, %User{}} ->
+      {:ok, %User{} = user} ->
         conn
-        |> put_flash(:error, "Client registered.")
+        |> Guardian.Plug.sign_in(user)
+        |> put_flash(:info, "Successfully registered.")
         |> redirect(to: "/")
 
       {:error, %Changeset{}} ->
@@ -41,7 +34,7 @@ defmodule FauxBankerWeb.AuthController do
   end
 
   def signin_form(conn, _params) do
-    render(conn, "signin.html", form_url: Routes.auth_path(conn, :callback))
+    render(conn, "signin.html")
   end
 
   def callback(%{assigns: %{ueberauth_failure: _fails}} = conn, _params),
@@ -56,7 +49,6 @@ defmodule FauxBankerWeb.AuthController do
         conn
         |> Guardian.Plug.sign_in(user)
         |> put_flash(:info, "Successfully authenticated.")
-        |> put_session(:current_user, user)
         |> redirect(to: "/")
 
       {:error, _reason} ->

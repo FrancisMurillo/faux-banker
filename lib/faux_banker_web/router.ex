@@ -10,7 +10,13 @@ defmodule FauxBankerWeb.Router do
   end
 
   pipeline :browser_auth do
+    plug(Guardian.Plug.Pipeline,
+      module: FauxBanker.Guardian,
+      error_handler: FauxBankerWeb.AuthErrorHandler
+    )
+
     plug(Guardian.Plug.VerifySession)
+    plug(Guardian.Plug.EnsureAuthenticated)
     plug(Guardian.Plug.LoadResource)
   end
 
@@ -25,6 +31,12 @@ defmodule FauxBankerWeb.Router do
     post("/registration", AuthController, :register_client)
 
     get("/signin", AuthController, :signin_form)
+  end
+
+  scope "/", FauxBankerWeb do
+    pipe_through([:browser, :browser_auth])
+
+    get("/", HomeController, :home_screen)
   end
 
   scope "/auth", FauxBankerWeb do
