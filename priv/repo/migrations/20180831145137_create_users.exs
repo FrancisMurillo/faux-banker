@@ -4,6 +4,7 @@ defmodule FauxBanker.Repo.Migrations.CreateUsers do
   def change do
     create table(:users, primary_key: false) do
       add(:id, :binary_id, primary_key: true)
+      add(:code, :string)
       add(:username, :citext, null: true)
       add(:email, :citext, null: false)
       add(:role, :integer)
@@ -15,6 +16,7 @@ defmodule FauxBanker.Repo.Migrations.CreateUsers do
       timestamps()
     end
 
+    create(unique_index(:users, [:code]))
     create(unique_index(:users, [:username], where: "username IS NOT NULL"))
     create(unique_index(:users, [:email]))
   end

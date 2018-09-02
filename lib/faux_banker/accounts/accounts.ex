@@ -37,6 +37,16 @@ defmodule FauxBanker.Accounts do
     end
   end
 
+  def get_user_by_email(email),
+    do:
+      User
+      |> Repo.get_by(email: email)
+
+  def get_user(id),
+    do:
+      User
+      |> Repo.get_by(email: id)
+
   # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
   def find_user_by_authentication(%{} = attrs) do
     email = Map.get(attrs, "email", nil) || Map.get(attrs, :email, nil)

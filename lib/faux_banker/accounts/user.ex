@@ -6,9 +6,12 @@ defmodule FauxBanker.Accounts.User do
   import Ecto.Changeset
   alias Comeonin.Bcrypt, as: Comeonin
 
+  alias FauxBanker.Randomizer
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "users" do
+    field(:code, :string)
     field(:username, :string, null: true)
     field(:role, FauxBanker.Enums.Role)
     field(:email, :string)
@@ -26,6 +29,7 @@ defmodule FauxBanker.Accounts.User do
     user
     |> cast(attrs, [
       :id,
+      :code,
       :username,
       :role,
       :email,
@@ -59,9 +63,12 @@ defmodule FauxBanker.Accounts.User do
         |> get_change(:password, "")
         |> Comeonin.hashpwsalt()
 
+      code = get_field(changeset, :code) || Randomizer.randomizer(3, :upcase)
+
       changeset
       |> put_change(:password_hash, password_hash)
-      |> cast(%{role: :client}, [:role])
+      |> put_change(:role, :client)
+      |> put_change(:code, code)
     end)
   end
 end
