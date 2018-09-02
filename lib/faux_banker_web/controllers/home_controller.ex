@@ -3,6 +3,8 @@ defmodule FauxBankerWeb.HomeController do
 
   use FauxBankerWeb, :controller
 
-  def home_screen(conn, _params),
-    do: render(conn, "home.html")
+  def home_screen(conn, _params) do
+    conn
+    |> render("home.html")
+  end
 end

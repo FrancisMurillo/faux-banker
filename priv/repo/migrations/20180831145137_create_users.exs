@@ -17,7 +17,7 @@ defmodule FauxBanker.Repo.Migrations.CreateUsers do
     end
 
     create(unique_index(:users, [:code]))
-    create(unique_index(:users, [:username], where: "username IS NOT NULL"))
+    create(unique_index(:users, [:username]))
     create(unique_index(:users, [:email]))
   end
 end

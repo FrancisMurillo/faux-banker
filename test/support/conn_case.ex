@@ -27,8 +27,20 @@ defmodule FauxBankerWeb.ConnCase do
   end
 
   setup tags do
+    {:ok, event_store} = Commanded.EventStore.Adapters.InMemory.start_link()
+
     {:ok, _} = Application.ensure_all_started(:ecto)
+    {:ok, _} = Application.ensure_all_started(:commanded)
+
     {:ok, _} = Application.ensure_all_started(:faux_banker)
+
+    on_exit(fn ->
+      Application.stop(:commanded)
+
+      Application.stop(:faux_banker)
+
+      Commanded.Helpers.ProcessHelper.shutdown(event_store)
+    end)
 
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(FauxBanker.Repo)
 

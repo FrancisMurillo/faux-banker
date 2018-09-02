@@ -32,4 +32,7 @@ config :faux_banker, FauxBanker.Guardian,
   token_module: Guardian.Token.Jwt,
   error_handler: FauxBankerWeb.AuthErrorHandler
 
+config :commanded,
+  event_store_adapter: Commanded.EventStore.Adapters.EventStore
+
 import_config "#{Mix.env()}.exs"

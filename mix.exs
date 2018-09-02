@@ -29,6 +29,9 @@ defmodule FauxBanker.Mixfile do
       {:bcrypt_elixir, "~> 1.0"},
       {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false},
       {:comeonin, "~> 4.0"},
+      {:eventstore, "~> 0.14.0", override: true},
+      {:commanded, "~> 0.17"},
+      {:commanded_eventstore_adapter, "~> 0.3"},
       {:ecto_enum, "~> 1.0"},
       {:exconstructor, "~> 1.1.0"},
       {:ex_machina, "~> 2.2"},
@@ -52,7 +55,13 @@ defmodule FauxBanker.Mixfile do
 
   defp aliases do
     [
-      "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "ecto.setup": [
+        "ecto.create",
+        "ecto.migrate",
+        "run priv/repo/seeds.exs --no-start"
+      ],
+      "ecto.drop": ["ecto.drop", "event_store.drop"],
+      "ecto.create": ["ecto.create", "event_store.create", "event_store.init"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate", "test --no-start"]
     ]

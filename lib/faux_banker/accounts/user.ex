@@ -38,6 +38,7 @@ defmodule FauxBanker.Accounts.User do
       :phone_number,
       :password
     ])
+    |> unique_constraint(:code)
     |> unique_constraint(:username)
     |> unique_constraint(:email)
   end
@@ -63,12 +64,10 @@ defmodule FauxBanker.Accounts.User do
         |> get_change(:password, "")
         |> Comeonin.hashpwsalt()
 
-      code = get_field(changeset, :code) || Randomizer.randomizer(3, :upcase)
-
       changeset
       |> put_change(:password_hash, password_hash)
       |> put_change(:role, :client)
-      |> put_change(:code, code)
+      |> put_change(:code, Randomizer.randomizer(3, :upcase))
     end)
   end
 end

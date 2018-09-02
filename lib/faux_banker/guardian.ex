@@ -3,7 +3,6 @@ defmodule FauxBanker.Guardian do
 
   use Guardian, otp_app: :faux_banker
 
-  alias FauxBanker.Repo
   alias FauxBanker.Accounts
   alias FauxBanker.Accounts.User
 

@@ -7,6 +7,7 @@ defmodule FauxBanker.Generator do
   alias Timex
   alias UUID
 
+  alias FauxBanker.Randomizer
   alias FauxBanker.Enums.Role
 
   alias Faker.{
@@ -33,7 +34,7 @@ defmodule FauxBanker.Generator do
     do: sequence(:role, enum_keys(Role))
 
   def code(),
-    do: "code" |> sequence() |> String.upcase()
+    do: Randomizer.randomizer(20, :upcase)
 
   def name(),
     do: Cat.name()

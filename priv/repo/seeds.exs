@@ -11,3 +11,11 @@ import FauxBanker.Factory
   role: :manager,
   password_hash: Comeonin.hashpwsalt("123456")
 })
+
+:user
+|> insert(%{
+  username: "nobody",
+  email: "nobody@email.com",
+  role: :client,
+  password_hash: Comeonin.hashpwsalt("123456")
+})

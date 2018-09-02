@@ -31,7 +31,15 @@ config :phoenix, :stacktrace_depth, 20
 config :faux_banker, FauxBanker.Repo,
   adapter: Ecto.Adapters.Postgres,
   username: "faux_user",
-  password: "postgres",
+  password: "faux1234",
   database: "faux_dev",
+  hostname: "localhost",
+  pool_size: 10
+
+config :eventstore, EventStore.Storage,
+  serializer: Commanded.Serialization.JsonSerializer,
+  username: "faux_user",
+  password: "faux1234",
+  database: "faux_eventstore_dev",
   hostname: "localhost",
   pool_size: 10

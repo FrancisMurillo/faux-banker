@@ -1,10 +1,7 @@
 defmodule FauxBankerWeb.AuthErrorHandler do
   @moduledoc nil
 
-  use FauxBankerWeb, :controller
-
   import Phoenix.Controller
-  import Plug.Conn
 
   alias FauxBankerWeb.Router.Helpers, as: Routes
 

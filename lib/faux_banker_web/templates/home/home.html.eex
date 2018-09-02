@@ -1,1 +1,1 @@
-<p>Meow</p>
+<p>Hello <%= @user.email %></p>
