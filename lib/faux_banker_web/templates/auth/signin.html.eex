@@ -1,6 +1,8 @@
-<%= form_tag auth_path(@conn, :callback), method: "post" do %>
-  <p class="h1">Faux Banker</p>
+<p class="h1">Faux Banker</p>
 
+<%= render FauxBankerWeb.LayoutView, "alert.html", assigns %>
+
+<%= form_tag auth_path(@conn, :callback), method: "post" do %>
   <div class='control-group'>
     <label class='control-label' for='email-input'>Username/Email</label>
     <input class='form-control' name='username' />

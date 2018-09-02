@@ -35,4 +35,7 @@ config :faux_banker, FauxBanker.Guardian,
 config :commanded,
   event_store_adapter: Commanded.EventStore.Adapters.EventStore
 
+config :commanded_ecto_projections,
+  repo: FauxBanker.Repo
+
 import_config "#{Mix.env()}.exs"

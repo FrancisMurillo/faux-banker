@@ -64,10 +64,10 @@ defmodule FauxBankerWeb.AuthController do
   defp handle_auth(%Auth{credentials: credentials}, _params),
     do: {:error, :not_implemented}
 
-  def logout(conn, _params),
+  def signout(conn, _params),
     do:
       conn
       |> Guardian.Plug.sign_out()
       |> put_flash(:info, "Logged out")
-      |> redirect(to: "/")
+      |> redirect(to: Routes.auth_path(conn, :signin_form))
 end

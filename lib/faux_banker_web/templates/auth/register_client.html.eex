@@ -1,44 +1,46 @@
+<p class="h1">Client Registration</p>
+
+<%= render FauxBankerWeb.LayoutView, "alert.html", assigns %>
+
 <%= form_tag auth_path(@conn, :register_client), method: "post" do %>
-  <p class="h1">Client Registration</p>
+<div class='control-group'>
+  <label class='control-label' for='email-input'>Email</label>
+  <input class='form-control' type='email' name='email' value='<%= @conn.params["email"] %>' />
+</div>
 
-  <div class='control-group'>
-    <label class='control-label' for='email-input'>Email</label>
-    <input class='form-control' type='email' name='email' value='<%= @conn.params["email"] %>' />
-  </div>
+<div class='control-group'>
+  <label class='control-label' for='first-name-input'>First Name</label>
+  <input class='form-control' type='text' name='first_name' value='<%= @conn.params["first_name"] %>' />
+</div>
 
-  <div class='control-group'>
-    <label class='control-label' for='first-name-input'>First Name</label>
-    <input class='form-control' type='text' name='first_name' value='<%= @conn.params["first_name"] %>' />
-  </div>
+<div class='control-group'>
+  <label class='control-label' for='last-name-input'>Last Name</label>
+  <input class='form-control' type='text' name='last_name' value='<%= @conn.params["last_name"] %>' />
+</div>
 
-  <div class='control-group'>
-    <label class='control-label' for='last-name-input'>Last Name</label>
-    <input class='form-control' type='text' name='last_name' value='<%= @conn.params["last_name"] %>' />
-  </div>
+<div class='control-group'>
+  <label class='control-label' for='nickname-input'>Username</label>
+  <input class='form-control' type='text' name='username' value='<%= @conn.params["username"] %>' />
+</div>
 
-  <div class='control-group'>
-    <label class='control-label' for='nickname-input'>Username</label>
-    <input class='form-control' type='text' name='username' value='<%= @conn.params["username"] %>' />
-  </div>
+<div class='control-group'>
+  <label class='control-label' for='phone-input'>Phone</label>
+  <input class='form-control' type='tel' name='phone_number' value='<%= @conn.params["phone_number"] %>' />
+</div>
 
-  <div class='control-group'>
-    <label class='control-label' for='phone-input'>Phone</label>
-    <input class='form-control' type='tel' name='phone_number' value='<%= @conn.params["phone_number"] %>' />
-  </div>
+<div class='control-group'>
+  <label class='control-label' for='password-input'>Password</label>
+  <input class='form-control' type='password' name='password' />
+</div>
 
-  <div class='control-group'>
-    <label class='control-label' for='password-input'>Password</label>
-    <input class='form-control' type='password' name='password' />
-  </div>
+<div class='control-group'>
+  <a href='<%= auth_path(@conn, :signin_form) %>' class='btn btn-secondary tabindex='-1' role='button'
+     aria-disabled='true'>
+    Back
+  </a>
+</div>
 
-  <div class='control-group'>
-    <a href='<%= auth_path(@conn, :signin_form) %>' class='btn btn-secondary tabindex='-1' role='button'
-       aria-disabled='true'>
-      Back
-    </a>
-  </div>
-
-  <div class='control-group'>
-    <button class='btn btn-primary'>Register</button>
-  </div>
+<div class='control-group'>
+  <button class='btn btn-primary'>Register</button>
+</div>
 <% end %>

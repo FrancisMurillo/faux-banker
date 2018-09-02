@@ -45,7 +45,7 @@ defmodule FauxBankerWeb.Router do
     get("/:provider", AuthController, :request)
     post("/identity/callback", AuthController, :callback)
     get("/:provider/callback", AuthController, :callback)
-    delete("/logout", AuthController, :delete)
+    delete("/logout", AuthController, :signout)
   end
 
   # Other scopes may use custom stacks.

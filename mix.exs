@@ -32,6 +32,7 @@ defmodule FauxBanker.Mixfile do
       {:eventstore, "~> 0.14.0", override: true},
       {:commanded, "~> 0.17"},
       {:commanded_eventstore_adapter, "~> 0.3"},
+      {:commanded_ecto_projections, "~> 0.7"},
       {:ecto_enum, "~> 1.0"},
       {:exconstructor, "~> 1.1.0"},
       {:ex_machina, "~> 2.2"},
