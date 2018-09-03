@@ -1,22 +1,4 @@
-<nav class='navbar navbar-expand-lg navbar-dark bg-primary'>
-  <a class='navbar-brand' href='/'>Faux Bank</a>
-
-  <ul class='navbar-nav'>
-    <li class='nav-item'>
-      <span class='navbar-text'>
-        <%= @user.email %>
-      </span>
-    </li>
-    <li class='nav-item'>
-      <%= form_tag auth_path(@conn, :signout), method: "delete" do %>
-      <button class='btn btn-primary'>
-        Logout
-      </button>
-      <% end %>
-    </li>
-  </ul>
-</nav>
-
+<%= render FauxBankerWeb.LayoutView, "header.html", assigns %>
 <%= render FauxBankerWeb.LayoutView, "alert.html", assigns %>
 
 <%= render "manager_home.html", assigns %>

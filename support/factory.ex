@@ -4,4 +4,5 @@ defmodule FauxBanker.Factory do
   use ExMachina.Ecto, repo: FauxBanker.Repo
 
   use FauxBanker.AccountsFactory
+  use FauxBanker.BankAccountsFactory
 end

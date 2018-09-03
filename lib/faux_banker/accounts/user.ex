@@ -10,6 +10,8 @@ defmodule FauxBanker.Accounts.User do
 
   alias FauxBanker.Randomizer
 
+  alias FauxBanker.BankAccounts.BankAccount
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "users" do
@@ -22,6 +24,13 @@ defmodule FauxBanker.Accounts.User do
     field(:phone_number, :string, null: true)
     field(:password, :string, virtual: true)
     field(:password_hash, :string, null: true)
+
+    has_many(
+      :accounts,
+      BankAccount,
+      foreign_key: :client_id,
+      references: :id
+    )
 
     timestamps()
   end

@@ -15,6 +15,7 @@ defmodule FauxBanker.Clients.Client do
     field(:last_name, :string, null: true)
     field(:phone_number, :string, null: true)
 
+    field(:role, FauxBanker.Enums.Role)
     timestamps()
   end
 end

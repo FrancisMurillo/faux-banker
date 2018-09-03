@@ -18,7 +18,8 @@ defmodule FauxBanker.AccountsFactory do
           role: Generator.role(),
           first_name: Generator.name(),
           last_name: Generator.name(),
-          phone_number: Generator.phone_number()
+          phone_number: Generator.phone_number(),
+          accounts: build_list(3, :bank_account, %{})
         }
     end
   end

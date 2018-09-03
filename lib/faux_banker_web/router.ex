@@ -37,6 +37,10 @@ defmodule FauxBankerWeb.Router do
     pipe_through([:browser, :browser_auth])
 
     get("/", HomeController, :home_screen)
+
+    scope "/clients" do
+      get("/:code", ClientController, :view_screen)
+    end
   end
 
   scope "/auth", FauxBankerWeb do

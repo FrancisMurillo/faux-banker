@@ -12,6 +12,8 @@ defmodule FauxBanker.Generator do
 
   alias Faker.{
     Cat,
+    Commerce,
+    Company,
     Phone.EnGb
   }
 
@@ -41,6 +43,14 @@ defmodule FauxBanker.Generator do
 
   def phone_number(),
     do: EnGb.number()
+
+  def account_name(),
+    do: Company.name()
+
+  def description(), do: Company.catch_phrase()
+
+  def decimal(),
+    do: Faker.random_between(1000, 100_000)
 
   defp enum_keys(enum),
     do: enum.__enum_map__() |> Enum.map(&elem(&1, 0))
