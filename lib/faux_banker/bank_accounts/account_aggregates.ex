@@ -1,12 +1,13 @@
-defmodule FauxBanker.BankAccounts.Aggregates do
+defmodule FauxBanker.BankAccounts.Accounts.Aggregates do
   @moduledoc nil
 
   alias __MODULE__, as: State
   alias FauxBanker.BankAccounts, as: Context
+  alias Context.Accounts, as: AccountSubContext
 
-  alias Context.Commands.{OpenAccount}
+  alias AccountSubContext.Commands.{OpenAccount}
 
-  alias Context.Events.{AccountOpened}
+  alias AccountSubContext.Events.{AccountOpened}
 
   defstruct []
 
@@ -17,16 +18,19 @@ defmodule FauxBanker.BankAccounts.Aggregates do
     do: %State{}
 end
 
-defmodule FauxBanker.BankAccounts.Router do
+defmodule FauxBanker.BankAccounts.Accounts.Router do
   use Commanded.Commands.Router
 
   alias FauxBanker.BankAccounts, as: Context
+  alias Context.Accounts, as: AccountSubContext
 
-  alias Context.Commands.{OpenAccount}
+  alias AccountSubContext.Commands.{OpenAccount}
 
-  alias Context.Aggregates, as: State
+  alias AccountSubContext.Aggregates, as: State
 
   identify(State, by: :id, prefix: "bank-account-")
+
+  middleware(FauxBanker.Support.ChangesetMiddleware)
 
   if Mix.env() == :test do
     dispatch(State, to: State)

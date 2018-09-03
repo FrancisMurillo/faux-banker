@@ -12,7 +12,6 @@ defmodule FauxBanker.Generator do
 
   alias Faker.{
     Cat,
-    Commerce,
     Company,
     Phone.EnGb
   }

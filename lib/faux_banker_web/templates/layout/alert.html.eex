@@ -2,9 +2,9 @@
 <div class='alert alert-info' role='alert'>
   <%= get_flash(@conn, :info) %>
 </div>
-<%= end %>
+<% end %>
 <%= if get_flash(@conn, :error) do %>
 <div class='alert alert-danger' role='alert'>
   <%= get_flash(@conn, :error) %>
 </div>
-<%= end %>
+<% end %>

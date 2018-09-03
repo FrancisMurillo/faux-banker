@@ -7,7 +7,7 @@
 </a>
 
 <p class='h5 p-3'>
-  Client: <%= @client.email %> / <%= @client.username %>
+  Client: <%= @client.username %>
 </p>
 
 <div class='container-fluid p-3'>
@@ -35,7 +35,7 @@
   </table>
 </div>
 
-<a href='/' class='btn btn-primary m-1' tabindex='-1' role='button'
+<a href='<%= client_path(@conn, :open_account_screen, @client.code) %>' class='btn btn-primary m-1' tabindex='-1' role='button'
    aria-disabled='true'>
   Open Account
 </a>

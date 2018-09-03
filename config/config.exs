@@ -33,7 +33,9 @@ config :faux_banker, FauxBanker.Guardian,
   error_handler: FauxBankerWeb.AuthErrorHandler
 
 config :commanded,
-  event_store_adapter: Commanded.EventStore.Adapters.EventStore
+  event_store_adapter: Commanded.EventStore.Adapters.EventStore,
+  dispatch_consistency_timeout: 10_000,
+  default_consistency: :strong
 
 config :commanded_ecto_projections,
   repo: FauxBanker.Repo

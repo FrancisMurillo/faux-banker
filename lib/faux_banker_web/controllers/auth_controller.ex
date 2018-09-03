@@ -6,7 +6,6 @@ defmodule FauxBankerWeb.AuthController do
 
   alias Ecto.Changeset
   alias Ueberauth.Auth
-  alias Ueberauth.Strategy.Helpers
 
   alias FauxBanker.Guardian
   alias FauxBankerWeb.Router.Helpers, as: Routes
@@ -41,7 +40,7 @@ defmodule FauxBankerWeb.AuthController do
     do:
       conn
       |> put_flash(:error, "Failed to authenticate.")
-      |> redirect(to: Routes.auth_path(:signin))
+      |> redirect(to: Routes.auth_path(conn, :signin))
 
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, params) do
     case handle_auth(auth, params) do
@@ -61,7 +60,7 @@ defmodule FauxBankerWeb.AuthController do
   defp handle_auth(%Auth{provider: :identity}, params),
     do: Context.find_user_by_authentication(params)
 
-  defp handle_auth(%Auth{credentials: credentials}, _params),
+  defp handle_auth(%Auth{}, _params),
     do: {:error, :not_implemented}
 
   def signout(conn, _params),

@@ -1,8 +1,6 @@
 defmodule FauxBanker.Clients.Client do
   @moduledoc nil
 
-  alias __MODULE__, as: Entity
-
   use Ecto.Schema
 
   @primary_key {:id, :binary_id, autogenerate: true}
