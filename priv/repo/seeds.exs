@@ -9,7 +9,8 @@ import FauxBanker.Factory
   username: "manager",
   email: "manager@email.com",
   role: :manager,
-  password_hash: Comeonin.hashpwsalt("123456")
+  password_hash: Comeonin.hashpwsalt("123456"),
+  accounts: []
 })
 
 :user

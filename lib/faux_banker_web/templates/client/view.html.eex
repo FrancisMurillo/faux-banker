@@ -1,26 +1,41 @@
 <%= render FauxBankerWeb.LayoutView, "header.html", assigns %>
 <%= render FauxBankerWeb.LayoutView, "alert.html", assigns %>
 
-<table class='table table-sm table-striped table-hover'>
-  <thead class='thead-dark'>
-    <tr>
-      <th scope='col'>Account</th>
-      <th scope='col'>Balance</th>
-      <th scope='col'>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <%= for account <- bank_accounts(@client.id) do %>
-    <tr>
-      <td>
-        <%= account.name %>
-      </td>
-      <td>
-        <%= Decimal.round(account.balance, 2) %>
-      </td>
+<a href='/' class='btn btn-secondary m-1' tabindex='-1' role='button'
+   aria-disabled='true'>
+  Back
+</a>
 
-    </tr>
+<p class='h5 p-3'>
+  Client: <%= @client.email %> / <%= @client.username %>
+</p>
 
-    <% end %>
-  </tbody>
-</table>
+<div class='container-fluid p-3'>
+  <p class='h3'>Accounts</p>
+
+  <table class='table table-sm table-striped table-hover'>
+    <thead class='thead-dark'>
+      <tr>
+        <th scope='col'>Account</th>
+        <th scope='col'>Balance</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for account <- bank_accounts(@client.id) do %>
+          <tr>
+            <td>
+              <%= account.name %>
+            </td>
+            <td>
+              <%= Decimal.round(account.balance, 2) %>
+            </td>
+          </tr>
+          <% end %>
+    </tbody>
+  </table>
+</div>
+
+<a href='/' class='btn btn-primary m-1' tabindex='-1' role='button'
+   aria-disabled='true'>
+  Open Account
+</a>

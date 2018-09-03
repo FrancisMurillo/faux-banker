@@ -1,7 +1,3 @@
-defmodule FauxBanker.BankAccounts.Queries do
-  import Ecto.Query
-end
-
 defmodule FauxBanker.BankAccounts.Aggregates do
   @moduledoc nil
 
@@ -11,6 +7,14 @@ defmodule FauxBanker.BankAccounts.Aggregates do
   alias Context.Commands.{OpenAccount}
 
   alias Context.Events.{AccountOpened}
+
+  defstruct []
+
+  def execute(_state, %OpenAccount{}),
+    do: %AccountOpened{}
+
+  def apply(_state, %AccountOpened{}),
+    do: %State{}
 end
 
 defmodule FauxBanker.BankAccounts.Router do
