@@ -4,7 +4,8 @@ defmodule FauxBanker.BankAccounts do
   alias __MODULE__, as: Context
   alias Context.Accounts, as: AccountContext
 
-  # alias Ecto.Changeset
+  import Ecto.Changeset
+  alias Ecto.Changeset
   alias UUID
 
   alias FauxBanker.{Repo, Router}
@@ -29,16 +30,21 @@ defmodule FauxBanker.BankAccounts do
   def open_client_account(client, attrs) do
     id = UUID.uuid4()
 
-    %OpenAccount{id: id}
-    |> OpenAccount.changeset(client, attrs)
-    |> Router.dispatch()
-    |> case do
-      :ok ->
-        account = Repo.get!(BankAccount, id)
-        {:ok, account}
+    case OpenAccount.changeset(%OpenAccount{id: id}, client, attrs) do
+      %Changeset{valid?: false} = changeset ->
+        {:error, changeset}
 
-      error ->
-        error
+      changeset ->
+        command = apply_changes(changeset)
+
+        case Router.dispatch(command) do
+          :ok ->
+            account = Repo.get!(BankAccount, id)
+            {:ok, account}
+
+          error ->
+            error
+        end
     end
   end
 end

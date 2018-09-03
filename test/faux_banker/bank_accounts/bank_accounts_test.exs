@@ -21,7 +21,7 @@ defmodule FauxBanker.BankAccountsTest do
 
     @tag :positive
     test "should work and only once", %{client: client} do
-      params = string_params_for(:bank_account, %{})
+      params = string_params_for(:open_client_account, %{})
 
       assert {:ok, %BankAccount{}} = Context.open_client_account(client, params)
 

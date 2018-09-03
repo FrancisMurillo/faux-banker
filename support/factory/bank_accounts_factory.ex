@@ -15,6 +15,13 @@ defmodule FauxBanker.BankAccountsFactory do
           description: Generator.description(),
           balance: Generator.decimal()
         }
+
+      def open_client_account_factory,
+        do: %{
+          name: Generator.account_name(),
+          description: Generator.description(),
+          initial_balance: Generator.decimal()
+        }
     end
   end
 end
