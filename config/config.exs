@@ -38,6 +38,7 @@ config :commanded,
   default_consistency: :strong
 
 config :commanded_ecto_projections,
-  repo: FauxBanker.Repo
+  repo: FauxBanker.Repo,
+  schema_projections: ""
 
 import_config "#{Mix.env()}.exs"

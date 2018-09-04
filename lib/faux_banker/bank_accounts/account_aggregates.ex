@@ -9,13 +9,30 @@ defmodule FauxBanker.BankAccounts.Accounts.Aggregates do
 
   alias AccountSubContext.Events.{AccountOpened}
 
-  defstruct [:id, :balance]
+  defstruct [:code, :balance]
 
-  def execute(_state, %OpenAccount{id: id, client_id}),
-    do: %AccountOpened{}
+  def execute(
+        _state,
+        %OpenAccount{
+          id: id,
+          client_id: client_id,
+          code: code,
+          name: name,
+          description: description,
+          initial_balance: balance
+        }
+      ),
+      do: %AccountOpened{
+        id: id,
+        client_id: client_id,
+        code: code,
+        name: name,
+        description: description,
+        balance: balance
+      }
 
-  def apply(_state, %AccountOpened{}),
-    do: %State{}
+  def apply(_state, %AccountOpened{code: code, balance: balance}),
+    do: %State{code: code, balance: balance}
 end
 
 defmodule FauxBanker.BankAccounts.Accounts.Router do
@@ -29,8 +46,6 @@ defmodule FauxBanker.BankAccounts.Accounts.Router do
   alias AccountSubContext.Aggregates, as: State
 
   identify(State, by: :id, prefix: "bank-account-")
-
-  middleware(FauxBanker.Support.ChangesetMiddleware)
 
   if Mix.env() == :test do
     dispatch(State, to: State)

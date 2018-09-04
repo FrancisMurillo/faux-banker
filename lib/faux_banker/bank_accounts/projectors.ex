@@ -1,7 +1,7 @@
 defmodule FauxBanker.BankAccounts.Projectors do
   @moduledoc nil
 
-  defmodule BankAccountManager do
+  defmodule AccountManager do
     @moduledoc nil
 
     use Commanded.Projections.Ecto,
@@ -22,9 +22,16 @@ defmodule FauxBanker.BankAccounts.Projectors do
     }
 
     def error({:error, %Changeset{}}, _event, _context),
-      do: {:skip, :continue_pending}
+      do: :skip
 
-    project %AccountOpened{id: id, client_id: client_id} = event do
+    project %AccountOpened{
+              id: id,
+              client_id: client_id,
+              code: code,
+              name: name,
+              description: description,
+              balance: balance
+            } = event do
       client = Repo.get!(Client, client_id)
 
       multi
@@ -33,7 +40,7 @@ defmodule FauxBanker.BankAccounts.Projectors do
         Entity.open_account_changeset(
           %Entity{id: id},
           client,
-          Map.from_struct(event)
+          %{code: code, name: name, description: description, balance: balance}
         )
       )
     end

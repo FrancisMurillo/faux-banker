@@ -39,8 +39,11 @@ defmodule FauxBanker.BankAccounts do
 
         case Router.dispatch(command) do
           :ok ->
-            account = Repo.get!(BankAccount, id)
-            {:ok, account}
+            if account = Repo.get(BankAccount, id) do
+              {:ok, account}
+            else
+              {:error, changeset}
+            end
 
           error ->
             error

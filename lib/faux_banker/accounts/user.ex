@@ -8,7 +8,7 @@ defmodule FauxBanker.Accounts.User do
   import Ecto.Changeset
   alias Comeonin.Bcrypt, as: Comeonin
 
-  alias FauxBanker.Randomizer
+  alias FauxBanker.Support.Randomizer
 
   alias FauxBanker.BankAccounts.BankAccount
 

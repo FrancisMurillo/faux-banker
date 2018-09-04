@@ -42,8 +42,6 @@ defmodule FauxBankerWeb.ClientController do
   end
 
   def open_account(conn, %{"code" => code} = params) do
-    IO.inspect(params)
-
     if client = ClientContext.get_client_by_code(code) do
       case BankAccountContext.open_client_account(client, params) do
         {:ok, %BankAccount{code: code}} ->

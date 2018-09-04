@@ -7,7 +7,7 @@ defmodule FauxBanker.Generator do
   alias Timex
   alias UUID
 
-  alias FauxBanker.Randomizer
+  alias FauxBanker.Support.Randomizer
   alias FauxBanker.Enums.Role
 
   alias Faker.{

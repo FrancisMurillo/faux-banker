@@ -6,7 +6,7 @@ defmodule FauxBanker.BankAccounts.BankAccount do
   use Ecto.Schema
 
   import Ecto.Changeset
-  # alias FauxBanker.Randomizer
+  # alias FauxBanker.Support.Randomizer
 
   alias FauxBanker.Clients.Client
 
@@ -29,6 +29,13 @@ defmodule FauxBanker.BankAccounts.BankAccount do
     timestamps()
   end
 
+  @required_fields [
+    :code,
+    :name,
+    :description,
+    :balance
+  ]
+
   @doc false
   def changeset(%Entity{} = account, attrs) do
     account
@@ -43,13 +50,12 @@ defmodule FauxBanker.BankAccounts.BankAccount do
     |> unique_constraint(:name)
   end
 
-  def open_account_changeset(%Entity{} = account) do
+  def open_account_changeset(%Entity{} = account, %Client{} = client, attrs) do
     account
-    |> cast(attrs, [
-      :name,
-      :description,
-      :balance
-    ])
+    |> cast(attrs, [:id] ++ @required_fields)
+    |> validate_required(@required_fields)
+    |> unique_constraint(:code)
     |> unique_constraint(:name)
+    |> put_assoc(:client, client)
   end
 end

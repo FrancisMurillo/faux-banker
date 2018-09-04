@@ -1,4 +1,4 @@
-defmodule FauxBanker.Randomizer do
+defmodule FauxBanker.Support.Randomizer do
   @moduledoc "Random string generator module.\nThanks https://gist.github.com/ahmadshah/8d978bbc550128cca12dd917a09ddfb7\n"
 
   @doc "Generate random string based on the given legth. It is also possible to generate certain type of randomise string using the options below:\n* :all - generate alphanumeric random string\n* :alpha - generate nom-numeric random string\n* :numeric - generate numeric random string\n* :upcase - generate upper case non-numeric random string\n* :downcase - generate lower case non-numeric random string\n## Example\n    iex> Iurban.String.randomizer(20) //\"Je5QaLj982f0Meb0ZBSK\"\n"
