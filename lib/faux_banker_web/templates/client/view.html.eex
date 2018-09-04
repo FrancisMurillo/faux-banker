@@ -16,6 +16,7 @@
   <table class='table table-sm table-striped table-hover'>
     <thead class='thead-dark'>
       <tr>
+        <th scope='col'>#</th>
         <th scope='col'>Account</th>
         <th scope='col'>Balance</th>
       </tr>
@@ -23,6 +24,9 @@
     <tbody>
       <%= for account <- bank_accounts(@client.id) do %>
           <tr>
+            <td>
+              <%= account.code %>
+            </td>
             <td>
               <%= account.name %>
             </td>
