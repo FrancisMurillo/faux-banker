@@ -13,7 +13,6 @@
   Balance: <%= Decimal.round(@account.balance, 2) %>
 </p>
 
-
 <a href='<%= client_path(@conn, :withdraw_screen, @account.code) %>' class='btn btn-primary m-1' tabindex='-1' role='button'
    aria-disabled='true'>
   Withdraw
@@ -23,3 +22,36 @@
    aria-disabled='true'>
   Deposit
 </a>
+
+<div class='container-fluid p-3'>
+  <p class='h3'>Logs</p>
+
+  <table class='table table-sm table-striped table-hover'>
+    <thead class='thead-dark'>
+      <tr>
+        <th scope='col'>Date/Time</th>
+        <th scope='col'>Event</th>
+        <th scope='col'>Before</th>
+        <th scope='col'>After</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= for log <- account_logs(@account.code) do %>
+          <tr>
+            <td>
+              <%= log.logged_at %>
+            </td>
+            <td>
+              <%= log.event %>
+            </td>
+            <td>
+              <%= log.current_balance %>
+            </td>
+            <td>
+              <%= log.next_balance %>
+            </td>
+          </tr>
+          <% end %>
+    </tbody>
+  </table>
+</div>

@@ -8,9 +8,9 @@ defmodule FauxBanker.BankAccounts do
   alias Ecto.Changeset
   alias UUID
 
-  alias FauxBanker.{Repo, Router}
+  alias FauxBanker.{LogRepo, Repo, Router}
 
-  alias Context.BankAccount
+  alias Context.{AccountLog, BankAccount}
 
   alias AccountContext.Commands.{OpenAccount, WithdrawAmount, DepositAmount}
 
@@ -21,6 +21,13 @@ defmodule FauxBanker.BankAccounts do
 
     def select_accounts_by_client_id(client_id),
       do: from(b in BankAccount, where: b.client_id == ^client_id)
+
+    def select_account_logs_by_account_number(account_number),
+      do:
+        from(a in AccountLog,
+          where: a.code == ^account_number,
+          order_by: [desc: :logged_at]
+        )
   end
 
   def get_account_by_code(code),
@@ -29,6 +36,12 @@ defmodule FauxBanker.BankAccounts do
   def list_accounts_by_client_id(client_id),
     do:
       client_id |> Context.Queries.select_accounts_by_client_id() |> Repo.all()
+
+  def list_account_logs_by_account_number(code),
+    do:
+      code
+      |> Context.Queries.select_account_logs_by_account_number()
+      |> LogRepo.all()
 
   def open_client_account(client, attrs) do
     id = UUID.uuid4()
