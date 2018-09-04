@@ -116,19 +116,63 @@ defmodule FauxBanker.BankAccounts.Accounts.Events do
   @moduledoc nil
   defmodule AccountOpened do
     @moduledoc nil
-
+    @derive [Poison.Encoder]
     defstruct [:id, :client_id, :code, :name, :description, :balance]
   end
 
   defmodule AmountWithdrawn do
     @moduledoc nil
-
+    @derive [Poison.Encoder]
     defstruct [:id, :amount, :description, :balance]
   end
 
   defmodule AmountDeposited do
     @moduledoc nil
-
+    @derive [Poison.Encoder]
     defstruct [:id, :amount, :description, :balance]
   end
+end
+
+defimpl Commanded.Serialization.JsonDecoder,
+  for: FauxBanker.BankAccounts.Accounts.Events.AccountOpened do
+  @moduledoc nil
+
+  alias Decimal
+
+  alias FauxBanker.BankAccounts.Accounts.Events.AccountOpened, as: Event
+
+  def decode(%Event{balance: balance} = state),
+    do: %Event{state | balance: Decimal.new(balance)}
+end
+
+defimpl Commanded.Serialization.JsonDecoder,
+  for: FauxBanker.BankAccounts.Accounts.Events.AmountWithdrawn do
+  @moduledoc nil
+
+  alias Decimal
+
+  alias FauxBanker.BankAccounts.Accounts.Events.AmountWithdrawn, as: Event
+
+  def decode(%Event{balance: balance, amount: amount} = state),
+    do: %Event{
+      state
+      | balance: Decimal.new(balance),
+        amount: Decimal.new(amount)
+    }
+end
+
+defimpl Commanded.Serialization.JsonDecoder,
+  for: FauxBanker.BankAccounts.Accounts.Events.AmountDeposited do
+  @moduledoc nil
+
+  alias Decimal
+
+  alias FauxBanker.BankAccounts.Accounts.Events.AmountDeposited, as: Event
+
+  def decode(%Event{balance: balance, amount: amount} = state),
+    do: %Event{
+      state
+      | balance: Decimal.new(balance),
+        amount: Decimal.new(amount)
+    }
 end

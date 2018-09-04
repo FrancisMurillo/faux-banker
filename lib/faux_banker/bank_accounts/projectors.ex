@@ -122,7 +122,7 @@ defmodule FauxBanker.BankAccounts.Projectors do
         description: "",
         amount: 0.0,
         current_balance: 0.0,
-        next_balance: balance |> Decimal.to_float(),
+        next_balance: balance |> Decimal.new() |> Decimal.to_float(),
         logged_at: DateTime.utc_now()
       })
       |> LogRepo.insert()
@@ -139,8 +139,6 @@ defmodule FauxBanker.BankAccounts.Projectors do
             description: description
           } = event
         ) do
-      event |> IO.inspect(label: "event.with")
-
       %BankAccount{balance: current_balance, code: code} =
         Repo.get!(BankAccount, id)
 
@@ -149,9 +147,9 @@ defmodule FauxBanker.BankAccounts.Projectors do
         event: "Amount Withdrawn",
         code: code,
         description: description,
-        amount: amount |> Decimal.to_float(),
-        current_balance: current_balance |> Decimal.to_float(),
-        next_balance: balance |> Decimal.to_float(),
+        amount: amount |> Decimal.new() |> Decimal.to_float(),
+        current_balance: current_balance |> Decimal.new() |> Decimal.to_float(),
+        next_balance: balance |> Decimal.new() |> Decimal.to_float(),
         logged_at: DateTime.utc_now()
       })
       |> LogRepo.insert()
@@ -173,9 +171,9 @@ defmodule FauxBanker.BankAccounts.Projectors do
         event: "Amount Deposited",
         code: code,
         description: description,
-        amount: amount |> Decimal.to_float(),
-        current_balance: current_balance |> Decimal.to_float(),
-        next_balance: balance |> Decimal.to_float(),
+        amount: amount |> Decimal.new() |> Decimal.to_float(),
+        current_balance: current_balance |> Decimal.new() |> Decimal.to_float(),
+        next_balance: balance |> Decimal.new() |> Decimal.to_float(),
         logged_at: DateTime.utc_now()
       })
       |> LogRepo.insert()
