@@ -9,9 +9,9 @@ defmodule FauxBanker.BankAccounts.Accounts.Aggregates do
 
   alias AccountSubContext.Events.{AccountOpened}
 
-  defstruct []
+  defstruct [:id, :balance]
 
-  def execute(_state, %OpenAccount{}),
+  def execute(_state, %OpenAccount{id: id, client_id}),
     do: %AccountOpened{}
 
   def apply(_state, %AccountOpened{}),

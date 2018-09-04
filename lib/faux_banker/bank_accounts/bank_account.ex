@@ -30,8 +30,8 @@ defmodule FauxBanker.BankAccounts.BankAccount do
   end
 
   @doc false
-  def changeset(%Entity{} = user, attrs) do
-    user
+  def changeset(%Entity{} = account, attrs) do
+    account
     |> cast(attrs, [
       :id,
       :code,
@@ -40,6 +40,16 @@ defmodule FauxBanker.BankAccounts.BankAccount do
       :balance
     ])
     |> unique_constraint(:code)
+    |> unique_constraint(:name)
+  end
+
+  def open_account_changeset(%Entity{} = account) do
+    account
+    |> cast(attrs, [
+      :name,
+      :description,
+      :balance
+    ])
     |> unique_constraint(:name)
   end
 end
