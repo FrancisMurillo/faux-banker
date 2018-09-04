@@ -2,11 +2,15 @@ alias Comeonin.Bcrypt, as: Comeonin
 
 import FauxBanker.Factory
 
-alias FauxBanker.{Repo, Router}
+alias Mongo
+
+alias FauxBanker.{LogRepo, Repo, Router}
 alias FauxBanker.BankAccounts.BankAccount
 alias FauxBanker.BankAccounts.Accounts.Aggregates, as: AccountAggregates
 
 {:ok, _} = Application.ensure_all_started(:faux_banker)
+
+Mongo.Ecto.truncate(LogRepo)
 
 :user
 |> insert(%{

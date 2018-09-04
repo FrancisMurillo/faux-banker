@@ -119,8 +119,10 @@ defmodule FauxBanker.BankAccounts.Projectors do
       |> Entity.changeset(%{
         event: "Account Opened",
         code: code,
+        description: "",
+        amount: 0.0,
         current_balance: 0.0,
-        next_balance: balance |> Decimal.new() |> Decimal.to_float(),
+        next_balance: balance |> Decimal.to_float(),
         logged_at: DateTime.utc_now()
       })
       |> LogRepo.insert()
@@ -128,7 +130,17 @@ defmodule FauxBanker.BankAccounts.Projectors do
       nil
     end
 
-    def handle(_state, %AmountWithdrawn{id: id, balance: balance}) do
+    def handle(
+          _state,
+          %AmountWithdrawn{
+            id: id,
+            amount: amount,
+            balance: balance,
+            description: description
+          } = event
+        ) do
+      event |> IO.inspect(label: "event.with")
+
       %BankAccount{balance: current_balance, code: code} =
         Repo.get!(BankAccount, id)
 
@@ -136,8 +148,10 @@ defmodule FauxBanker.BankAccounts.Projectors do
       |> Entity.changeset(%{
         event: "Amount Withdrawn",
         code: code,
-        current_balance: current_balance |> Decimal.new() |> Decimal.to_float(),
-        next_balance: balance |> Decimal.new() |> Decimal.to_float(),
+        description: description,
+        amount: amount |> Decimal.to_float(),
+        current_balance: current_balance |> Decimal.to_float(),
+        next_balance: balance |> Decimal.to_float(),
         logged_at: DateTime.utc_now()
       })
       |> LogRepo.insert()
@@ -145,7 +159,12 @@ defmodule FauxBanker.BankAccounts.Projectors do
       nil
     end
 
-    def handle(_state, %AmountDeposited{id: id, balance: balance}) do
+    def handle(_state, %AmountDeposited{
+          id: id,
+          description: description,
+          amount: amount,
+          balance: balance
+        }) do
       %BankAccount{balance: current_balance, code: code} =
         Repo.get!(BankAccount, id)
 
@@ -153,8 +172,10 @@ defmodule FauxBanker.BankAccounts.Projectors do
       |> Entity.changeset(%{
         event: "Amount Deposited",
         code: code,
-        current_balance: current_balance |> Decimal.new() |> Decimal.to_float(),
-        next_balance: balance |> Decimal.new() |> Decimal.to_float(),
+        description: description,
+        amount: amount |> Decimal.to_float(),
+        current_balance: current_balance |> Decimal.to_float(),
+        next_balance: balance |> Decimal.to_float(),
         logged_at: DateTime.utc_now()
       })
       |> LogRepo.insert()

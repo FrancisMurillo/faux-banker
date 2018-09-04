@@ -45,24 +45,34 @@ defmodule FauxBanker.BankAccounts.Accounts.Aggregates do
         balance: balance
       }
 
-  def execute(%State{balance: balance}, %WithdrawAmount{id: id, amount: amount}) do
-    if amount > balance do
+  def execute(%State{balance: balance}, %WithdrawAmount{
+        id: id,
+        description: description,
+        amount: amount
+      }) do
+    if Decimal.cmp(amount, balance) == :gt do
       {:error, :invalid_amount}
     else
       %AmountWithdrawn{
         id: id,
+        description: description,
         amount: amount,
         balance: Decimal.sub(balance, amount)
       }
     end
   end
 
-  def execute(%State{balance: balance}, %DepositAmount{id: id, amount: amount}),
-    do: %AmountDeposited{
-      id: id,
-      amount: amount,
-      balance: Decimal.add(balance, amount)
-    }
+  def execute(%State{balance: balance}, %DepositAmount{
+        id: id,
+        description: description,
+        amount: amount
+      }),
+      do: %AmountDeposited{
+        id: id,
+        description: description,
+        amount: amount,
+        balance: Decimal.add(balance, amount)
+      }
 
   def apply(_state, %AccountOpened{id: id, balance: balance}),
     do: %State{id: id, balance: balance}
@@ -72,6 +82,24 @@ defmodule FauxBanker.BankAccounts.Accounts.Aggregates do
 
   def apply(state, %AmountDeposited{balance: balance}),
     do: %{state | balance: balance}
+end
+
+defimpl Poison.Encoder, for: Decimal do
+  def encode(value, options) do
+    value |> Decimal.to_float() |> Poison.encode!(options)
+  end
+end
+
+defimpl Commanded.Serialization.JsonDecoder,
+  for: FauxBanker.BankAccounts.Accounts.Aggregates do
+  @moduledoc nil
+
+  alias Decimal
+
+  alias FauxBanker.BankAccounts.Accounts.Aggregates, as: State
+
+  def decode(%State{balance: balance} = state),
+    do: %State{state | balance: Decimal.new(balance)}
 end
 
 defmodule FauxBanker.BankAccounts.Accounts.Router do

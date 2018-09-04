@@ -49,7 +49,7 @@ defmodule FauxBanker.Generator do
   def description(), do: Company.catch_phrase()
 
   def decimal(),
-    do: Faker.random_between(1000, 100_000)
+    do: Faker.random_between(1000, 10_000)
 
   defp enum_keys(enum),
     do: enum.__enum_map__() |> Enum.map(&elem(&1, 0))
