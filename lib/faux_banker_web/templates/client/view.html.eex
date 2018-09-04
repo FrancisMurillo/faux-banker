@@ -39,7 +39,7 @@
       <%= for log <- account_logs(@account.code) do %>
           <tr>
             <td>
-              <%= log.logged_at %>
+              <%= Timex.format!(Timex.local(log.logged_at), "%F %T", :strftime) %>
             </td>
             <td>
               <%= log.event %>
