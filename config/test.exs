@@ -14,6 +14,14 @@ config :faux_banker, FauxBanker.Repo,
   hostname: "localhost",
   pool: Ecto.Adapters.SQL.Sandbox
 
+config :faux_banker, FauxBanker.LogRepo,
+  adapter: Mongo.Ecto,
+  database: "faux_log_test",
+  username: "mongodb",
+  password: "mongodb",
+  hostname: "localhost",
+  pool: Ecto.Adapters.SQL.Sandbox
+
 config :commanded,
   event_store_adapter: Commanded.EventStore.Adapters.InMemory,
   dispatch_consistency_timeout: 5_000,

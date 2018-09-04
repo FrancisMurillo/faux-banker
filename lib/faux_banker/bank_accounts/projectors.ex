@@ -73,4 +73,96 @@ defmodule FauxBanker.BankAccounts.Projectors do
       )
     end
   end
+
+  defmodule LogManager do
+    @moduledoc nil
+
+    use Commanded.ProcessManagers.ProcessManager,
+      name: "BankAccounts.LogManager",
+      router: FauxBanker.Router,
+      consistency: :eventual
+
+    import Ecto.Changeset
+    alias Date
+    alias Decimal
+    alias UUID
+    alias Ecto.{Changeset}
+
+    alias FauxBanker.{Repo, LogRepo}
+
+    alias FauxBanker.BankAccounts, as: Context
+    alias Context.BankAccount
+    alias Context.AccountLog, as: Entity
+
+    alias Context.Accounts.Events.{
+      AccountOpened,
+      AmountWithdrawn,
+      AmountDeposited
+    }
+
+    defstruct []
+
+    def error({:error, %Changeset{}}, _event, _context),
+      do: :skip
+
+    def interested?(%AccountOpened{id: id}),
+      do: {:start, id}
+
+    def interested?(%AmountWithdrawn{id: id}),
+      do: {:continue, id}
+
+    def interested?(%AmountDeposited{id: id}),
+      do: {:continue, id}
+
+    def handle(_state, %AccountOpened{code: code, balance: balance}) do
+      %Entity{}
+      |> Entity.changeset(%{
+        event: "Account Opened",
+        code: code,
+        current_balance: 0.0,
+        next_balance: balance |> Decimal.new() |> Decimal.to_float(),
+        logged_at: DateTime.utc_now()
+      })
+      |> apply_changes()
+      |> LogRepo.insert()
+
+      nil
+    end
+
+    def handle(_state, %AmountWithdrawn{id: id, balance: balance}) do
+      %BankAccount{balance: current_balance, code: code} =
+        Repo.get!(BankAccount, id)
+
+      %Entity{}
+      |> Entity.changeset(%{
+        event: "Amount Withdrawn",
+        code: code,
+        current_balance: current_balance |> Decimal.new() |> Decimal.to_float(),
+        next_balance: balance |> Decimal.new() |> Decimal.to_float(),
+        logged_at: DateTime.utc_now()
+      })
+      |> apply_changes()
+      |> LogRepo.insert()
+
+      nil
+    end
+
+    def handle(_state, %AmountDeposited{id: id, balance: balance}) do
+      %BankAccount{balance: current_balance, code: code} =
+        Repo.get!(BankAccount, id)
+
+      %Entity{}
+      |> Entity.changeset(%{
+        event: "Amount Deposited",
+        code: code,
+        current_balance: current_balance |> Decimal.new() |> Decimal.to_float(),
+        next_balance: balance |> Decimal.new() |> Decimal.to_float(),
+        logged_at: DateTime.utc_now()
+      })
+      |> apply_changes()
+      |> LogRepo.insert()
+
+      nil
+    end
+  end
 end

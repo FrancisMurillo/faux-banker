@@ -6,7 +6,6 @@ defmodule FauxBanker.BankAccounts.BankAccount do
   use Ecto.Schema
 
   import Ecto.Changeset
-  # alias FauxBanker.Support.Randomizer
 
   alias FauxBanker.Clients.Client
 

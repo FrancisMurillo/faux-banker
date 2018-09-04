@@ -9,7 +9,8 @@ defmodule FauxBanker.BankAccounts.Supervisor do
     do:
       Supervisor.init(
         [
-          Context.Projectors.AccountManager
+          Context.Projectors.AccountManager,
+          Context.Projectors.LogManager
         ],
         strategy: :one_for_one
       )

@@ -6,6 +6,7 @@ defmodule FauxBanker.Application do
 
     children = [
       supervisor(FauxBanker.Repo, []),
+      supervisor(FauxBanker.LogRepo, []),
       supervisor(FauxBankerWeb.Endpoint, []),
       supervisor(FauxBanker.BankAccounts.Supervisor, [])
     ]

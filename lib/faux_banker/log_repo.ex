@@ -1,4 +1,4 @@
-defmodule FauxBanker.Repo do
+defmodule FauxBanker.LogRepo do
   @moduledoc nil
 
   use Ecto.Repo, otp_app: :faux_banker

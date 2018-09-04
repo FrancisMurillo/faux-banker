@@ -17,7 +17,7 @@ defmodule FauxBanker.BankAccounts.Accounts.Aggregates do
 
   defstruct [:id, :balance]
 
-  if Mix.env() == :test do
+  if Mix.env() != :prod do
     def execute(_state, %State{} = new_state),
       do: new_state
 
@@ -86,7 +86,7 @@ defmodule FauxBanker.BankAccounts.Accounts.Router do
 
   identify(State, by: :id, prefix: "bank-account-")
 
-  if Mix.env() == :test do
+  if Mix.env() != :prod do
     dispatch(State, to: State)
   end
 
