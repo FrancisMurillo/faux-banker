@@ -123,7 +123,6 @@ defmodule FauxBanker.BankAccounts.Projectors do
         next_balance: balance |> Decimal.new() |> Decimal.to_float(),
         logged_at: DateTime.utc_now()
       })
-      |> apply_changes()
       |> LogRepo.insert()
 
       nil
@@ -141,7 +140,6 @@ defmodule FauxBanker.BankAccounts.Projectors do
         next_balance: balance |> Decimal.new() |> Decimal.to_float(),
         logged_at: DateTime.utc_now()
       })
-      |> apply_changes()
       |> LogRepo.insert()
 
       nil
@@ -159,7 +157,6 @@ defmodule FauxBanker.BankAccounts.Projectors do
         next_balance: balance |> Decimal.new() |> Decimal.to_float(),
         logged_at: DateTime.utc_now()
       })
-      |> apply_changes()
       |> LogRepo.insert()
 
       nil

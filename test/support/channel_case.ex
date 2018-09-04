@@ -42,11 +42,10 @@ defmodule FauxBankerWeb.ChannelCase do
     end)
 
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(FauxBanker.Repo)
-    # :ok = Ecto.Adapters.SQL.Sandbox.checkout(FauxBanker.LogRepo)
+    Mongo.Ecto.truncate(FauxBanker.LogRepo)
 
     unless tags[:async] do
       Ecto.Adapters.SQL.Sandbox.mode(FauxBanker.Repo, {:shared, self()})
-      # Ecto.Adapters.SQL.Sandbox.mode(FauxBanker.LogRepo, {:shared, self()})
     end
 
     :ok

@@ -5,14 +5,14 @@ defmodule FauxBanker.BankAccountsTest do
   alias Ecto.Changeset
 
   import FauxBanker.Factory
-  alias FauxBanker.Router
+  alias FauxBanker.{LogRepo, Router}
 
   alias FauxBanker.Accounts.User
 
   alias FauxBanker.Clients, as: ClientContext
 
   alias FauxBanker.BankAccounts, as: Context
-  alias Context.BankAccount
+  alias Context.{BankAccount, AccountLog}
   alias Context.Accounts.Aggregates, as: AccountAggregates
 
   describe "Context.open_client_account/2" do
@@ -98,6 +98,65 @@ defmodule FauxBanker.BankAccountsTest do
     @tag :negative
     test "should fail safely", %{account: account} do
       assert {:error, %Changeset{}} = Context.deposit_to_account(account, %{})
+    end
+  end
+
+  describe "Context.AccountLogs" do
+    @tag :positive
+    test "should log newly opened account" do
+      %User{code: code} = insert(:client_user, %{accounts: []})
+
+      client = ClientContext.get_client_by_code(code)
+      params = string_params_for(:open_client_account, %{})
+
+      assert {:ok, %BankAccount{code: account_code}} =
+               Context.open_client_account(client, params)
+
+      Process.sleep(0)
+
+      assert %AccountLog{} =
+               LogRepo.get_by(AccountLog,
+                 code: account_code,
+                 event: "Account Opened"
+               )
+    end
+
+    @tag :positive
+    test "should log withdrawn amount" do
+      account = insert(:bank_account, %{})
+      %BankAccount{code: code} = account
+
+      :ok =
+        Router.dispatch(AccountAggregates |> struct(Map.from_struct(account)))
+
+      assert {:ok, %BankAccount{}} =
+               Context.withdraw_from_account(account, %{
+                 amount: :rand.uniform(10)
+               })
+
+      Process.sleep(0)
+
+      assert %AccountLog{} =
+               LogRepo.get_by(AccountLog, code: code, event: "Amount Withdrawn")
+    end
+
+    @tag :positive
+    test "should log deposited amount" do
+      account = insert(:bank_account, %{})
+      %BankAccount{code: code} = account
+
+      :ok =
+        Router.dispatch(AccountAggregates |> struct(Map.from_struct(account)))
+
+      assert {:ok, %BankAccount{}} =
+               Context.deposit_to_account(account, %{
+                 amount: :rand.uniform(10)
+               })
+
+      Process.sleep(0)
+
+      assert %AccountLog{} =
+               LogRepo.get_by(AccountLog, code: code, event: "Amount Deposited")
     end
   end
 end

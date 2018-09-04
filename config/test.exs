@@ -17,15 +17,12 @@ config :faux_banker, FauxBanker.Repo,
 config :faux_banker, FauxBanker.LogRepo,
   adapter: Mongo.Ecto,
   database: "faux_log_test",
-  username: "mongodb",
-  password: "mongodb",
-  hostname: "localhost",
-  pool: Ecto.Adapters.SQL.Sandbox
+  hostname: "localhost"
 
 config :commanded,
   event_store_adapter: Commanded.EventStore.Adapters.InMemory,
-  dispatch_consistency_timeout: 5_000,
-  assert_receive_event_timeout: 5_000
+  dispatch_consistency_timeout: 10_000,
+  assert_receive_event_timeout: 10_000
 
 config :eventstore, EventStore.Storage,
   serializer: EventStore.TermSerializer,
