@@ -12,7 +12,7 @@ defmodule FauxBanker.BankAccounts do
 
   alias Context.BankAccount
 
-  alias AccountContext.Commands.{OpenAccount}
+  alias AccountContext.Commands.{OpenAccount, WithdrawAmount}
 
   defmodule Queries do
     @moduledoc false
@@ -23,9 +23,12 @@ defmodule FauxBanker.BankAccounts do
       do: from(b in BankAccount, where: b.client_id == ^client_id)
   end
 
-  def list_accounts_by_client_id(client_id) do
-    client_id |> Context.Queries.select_accounts_by_client_id() |> Repo.all()
-  end
+  def get_account_by_code(code),
+    do: BankAccount |> Repo.get_by(code: code)
+
+  def list_accounts_by_client_id(client_id),
+    do:
+      client_id |> Context.Queries.select_accounts_by_client_id() |> Repo.all()
 
   def open_client_account(client, attrs) do
     id = UUID.uuid4()
@@ -44,6 +47,24 @@ defmodule FauxBanker.BankAccounts do
             else
               {:error, changeset}
             end
+
+          error ->
+            error
+        end
+    end
+  end
+
+  def withdraw_from_account(%BankAccount{} = account, attrs) do
+    case WithdrawAmount.changeset(%WithdrawAmount{}, account, attrs) do
+      %Changeset{valid?: false} = changeset ->
+        {:error, changeset}
+
+      changeset ->
+        command = apply_changes(changeset)
+
+        case Router.dispatch(command) do
+          :ok ->
+            {:ok, account}
 
           error ->
             error

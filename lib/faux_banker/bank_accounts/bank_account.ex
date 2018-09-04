@@ -58,4 +58,10 @@ defmodule FauxBanker.BankAccounts.BankAccount do
     |> unique_constraint(:name)
     |> put_assoc(:client, client)
   end
+
+  def update_balance_changeset(%Entity{} = account, attrs) do
+    account
+    |> cast(attrs, [:balance])
+    |> validate_required([:balance])
+  end
 end

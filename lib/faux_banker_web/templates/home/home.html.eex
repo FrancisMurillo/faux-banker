@@ -1,4 +1,10 @@
 <%= render FauxBankerWeb.LayoutView, "header.html", assigns %>
 <%= render FauxBankerWeb.LayoutView, "alert.html", assigns %>
 
-<%= render "manager_home.html", assigns %>
+<%= if @user.role == :manager do %>
+  <%= render "manager_home.html", assigns %>
+<% end %>
+
+<%= if @user.role == :client do %>
+  <%= render "client_home.html", assigns %>
+<% end %>

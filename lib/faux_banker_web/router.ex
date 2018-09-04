@@ -43,6 +43,15 @@ defmodule FauxBankerWeb.Router do
       get("/:code/open_account", ManagerController, :open_account_screen)
       post("/:code/open_account", ManagerController, :open_account)
     end
+
+    scope "/accounts" do
+      get("/:code", ClientController, :view_screen)
+      get("/:code/withdraw", ClientController, :withdraw_screen)
+      post("/:code/withdraw", ClientController, :withdraw)
+
+      get("/:code/deposit", ClientController, :deposit_screen)
+      post("/:code/deposit", ClientController, :deposit)
+    end
   end
 
   scope "/auth", FauxBankerWeb do

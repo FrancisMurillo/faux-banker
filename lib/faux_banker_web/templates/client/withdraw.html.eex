@@ -1,0 +1,31 @@
+<%= render FauxBankerWeb.LayoutView, "header.html", assigns %>
+<%= render FauxBankerWeb.LayoutView, "alert.html", assigns %>
+
+<a href='<%= client_path(@conn, :view_screen, @account.code) %>' class='btn btn-secondary m-1' tabindex='-1' role='button'
+   aria-disabled='true'>
+  Back
+</a>
+
+<div class='container-fluid p-3'>
+  <p class='h3'>Withdraw</p>
+  <p class='h5'><%= @account.name %></>
+  <p class='h5'><%= Decimal.round(@account.balance, 2) %></p>
+
+  <%= form_tag client_path(@conn, :withdraw, @account.code), method: "post" do %>
+  <div class='control-group'>
+    <label class='control-label'>Amount</label>
+    <input class='form-control' type='number' name='amount' value='<%= @conn.params["amount"] %>' />
+  </div>
+
+  <div class='control-group'>
+    <label class='control-label'>Description</label>
+    <input class='form-control' type='text' name='description' value='<%= @conn.params["description"] %>' />
+  </div>
+
+  <div class='control-group'>
+    <button class='btn btn-primary'>
+      Withdraw
+    </button>
+  </div>
+  <% end %>
+</div>
