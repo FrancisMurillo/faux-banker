@@ -39,9 +39,9 @@ defmodule FauxBankerWeb.Router do
     get("/", HomeController, :home_screen)
 
     scope "/clients" do
-      get("/:code", ClientController, :view_screen)
-      get("/:code/open_account", ClientController, :open_account_screen)
-      post("/:code/open_account", ClientController, :open_account)
+      get("/:code", ManagerController, :view_screen)
+      get("/:code/open_account", ManagerController, :open_account_screen)
+      post("/:code/open_account", ManagerController, :open_account)
     end
   end
 

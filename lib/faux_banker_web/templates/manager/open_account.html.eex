@@ -1,7 +1,7 @@
 <%= render FauxBankerWeb.LayoutView, "header.html", assigns %>
 <%= render FauxBankerWeb.LayoutView, "alert.html", assigns %>
 
-<a href='<%= client_path(@conn, :view_screen, @client.code) %>' class='btn btn-secondary m-1' tabindex='-1' role='button'
+<a href='<%= manager_path(@conn, :view_screen, @client.code) %>' class='btn btn-secondary m-1' tabindex='-1' role='button'
    aria-disabled='true'>
   Back
 </a>
@@ -10,7 +10,7 @@
   <p class='h3'>Open Account</p>
   <p class='h5'><%= @client.username %></p>
 
-  <%= form_tag client_path(@conn, :open_account, @client.code), method: "post" do %>
+  <%= form_tag manager_path(@conn, :open_account, @client.code), method: "post" do %>
   <div class='control-group'>
     <label class='control-label'>Name</label>
     <input class='form-control' type='text' name='name' value='<%= @conn.params["name"] %>' />

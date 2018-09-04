@@ -39,7 +39,7 @@
   </table>
 </div>
 
-<a href='<%= client_path(@conn, :open_account_screen, @client.code) %>' class='btn btn-primary m-1' tabindex='-1' role='button'
+<a href='<%= manager_path(@conn, :open_account_screen, @client.code) %>' class='btn btn-primary m-1' tabindex='-1' role='button'
    aria-disabled='true'>
   Open Account
 </a>

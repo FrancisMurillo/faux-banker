@@ -1,4 +1,4 @@
-defmodule FauxBankerWeb.ClientView do
+defmodule FauxBankerWeb.ManagerView do
   use FauxBankerWeb, :view
 
   alias FauxBanker.{BankAccounts}

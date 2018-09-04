@@ -1,4 +1,4 @@
-defmodule FauxBankerWeb.ClientController do
+defmodule FauxBankerWeb.ManagerController do
   @moduledoc false
 
   use FauxBankerWeb, :controller
@@ -50,7 +50,7 @@ defmodule FauxBankerWeb.ClientController do
             :info,
             "Opened new account with account number, #{account_code}."
           )
-          |> redirect(to: Routes.client_path(conn, :view_screen, code))
+          |> redirect(to: Routes.manager_path(conn, :view_screen, code))
 
         {:error, %Changeset{}} ->
           conn

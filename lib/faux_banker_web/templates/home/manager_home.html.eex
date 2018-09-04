@@ -15,7 +15,7 @@
               <%= client.first_name <> " " <> client.last_name %>
             </td>
             <td>
-              <a href='<%= client_path(@conn, :view_screen, client.code)
+              <a href='<%= manager_path(@conn, :view_screen, client.code)
                            %>' class='btn btn-secondary btn-md active'
                  role='button' aria-pressed='true'>
                 View
