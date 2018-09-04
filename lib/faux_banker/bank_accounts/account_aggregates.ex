@@ -13,6 +13,14 @@ defmodule FauxBanker.BankAccounts.Accounts.Aggregates do
 
   defstruct [:id, :balance]
 
+  if Mix.env() == :test do
+    def execute(_state, %State{} = new_state),
+      do: new_state
+
+    def apply(_state, %State{} = new_state),
+      do: new_state
+  end
+
   def execute(
         _state,
         %OpenAccount{

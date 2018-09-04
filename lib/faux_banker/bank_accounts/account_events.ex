@@ -31,7 +31,7 @@ defmodule FauxBanker.BankAccounts.Accounts.Commands do
     def changeset(%Command{} = command, %Client{id: client_id}, attrs) do
       {command, @schema}
       |> cast(attrs, @form_fields)
-      |> validate_required(@required_fields -- [:description])
+      |> validate_required(@form_fields -- [:description])
       |> validate_number(:initial_balance, greater_than: Decimal.new(0))
       |> force_change(:client_id, client_id)
       |> (fn changeset ->
