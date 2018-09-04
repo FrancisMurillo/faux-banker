@@ -7,9 +7,13 @@ defmodule FauxBanker.BankAccounts.Accounts.Aggregates do
 
   alias Decimal
 
-  alias AccountSubContext.Commands.{OpenAccount, WithdrawAmount}
+  alias AccountSubContext.Commands.{OpenAccount, WithdrawAmount, DepositAmount}
 
-  alias AccountSubContext.Events.{AccountOpened, AmountWithdrawn}
+  alias AccountSubContext.Events.{
+    AccountOpened,
+    AmountWithdrawn,
+    AmountDeposited
+  }
 
   defstruct [:id, :balance]
 
@@ -53,10 +57,20 @@ defmodule FauxBanker.BankAccounts.Accounts.Aggregates do
     end
   end
 
+  def execute(%State{balance: balance}, %DepositAmount{id: id, amount: amount}),
+    do: %AmountDeposited{
+      id: id,
+      amount: amount,
+      balance: Decimal.add(balance, amount)
+    }
+
   def apply(_state, %AccountOpened{id: id, balance: balance}),
     do: %State{id: id, balance: balance}
 
   def apply(state, %AmountWithdrawn{balance: balance}),
+    do: %{state | balance: balance}
+
+  def apply(state, %AmountDeposited{balance: balance}),
     do: %{state | balance: balance}
 end
 
@@ -66,7 +80,7 @@ defmodule FauxBanker.BankAccounts.Accounts.Router do
   alias FauxBanker.BankAccounts, as: Context
   alias Context.Accounts, as: AccountSubContext
 
-  alias AccountSubContext.Commands.{OpenAccount, WithdrawAmount}
+  alias AccountSubContext.Commands.{OpenAccount, WithdrawAmount, DepositAmount}
 
   alias AccountSubContext.Aggregates, as: State
 
@@ -79,7 +93,8 @@ defmodule FauxBanker.BankAccounts.Accounts.Router do
   dispatch(
     [
       OpenAccount,
-      WithdrawAmount
+      WithdrawAmount,
+      DepositAmount
     ],
     to: State
   )

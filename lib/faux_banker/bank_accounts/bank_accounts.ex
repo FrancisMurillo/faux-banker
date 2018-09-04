@@ -12,7 +12,7 @@ defmodule FauxBanker.BankAccounts do
 
   alias Context.BankAccount
 
-  alias AccountContext.Commands.{OpenAccount, WithdrawAmount}
+  alias AccountContext.Commands.{OpenAccount, WithdrawAmount, DepositAmount}
 
   defmodule Queries do
     @moduledoc false
@@ -56,6 +56,24 @@ defmodule FauxBanker.BankAccounts do
 
   def withdraw_from_account(%BankAccount{} = account, attrs) do
     case WithdrawAmount.changeset(%WithdrawAmount{}, account, attrs) do
+      %Changeset{valid?: false} = changeset ->
+        {:error, changeset}
+
+      changeset ->
+        command = apply_changes(changeset)
+
+        case Router.dispatch(command) do
+          :ok ->
+            {:ok, account}
+
+          error ->
+            error
+        end
+    end
+  end
+
+  def deposit_to_account(%BankAccount{} = account, attrs) do
+    case DepositAmount.changeset(%DepositAmount{}, account, attrs) do
       %Changeset{valid?: false} = changeset ->
         {:error, changeset}
 

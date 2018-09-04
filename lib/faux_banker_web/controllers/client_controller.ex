@@ -8,7 +8,6 @@ defmodule FauxBankerWeb.ClientController do
   alias FauxBanker.Guardian
   alias FauxBankerWeb.Router.Helpers, as: Routes
 
-  alias FauxBanker.Clients, as: ClientContext
   alias FauxBanker.BankAccounts, as: BankAccountContext
 
   alias BankAccountContext.{BankAccount}
@@ -48,11 +47,11 @@ defmodule FauxBankerWeb.ClientController do
           conn
           |> put_flash(
             :info,
-            "Withdrew from account number, #{account_code}."
+            "Withdrew successfuly from account number, #{account_code}."
           )
           |> redirect(to: Routes.client_path(conn, :view_screen, code))
 
-        {:error, %Changeset{} = changeset} ->
+        {:error, %Changeset{}} ->
           conn
           |> put_flash(:error, "Invalid data.")
           |> render("withdraw.html",
@@ -85,6 +84,32 @@ defmodule FauxBankerWeb.ClientController do
         user: Guardian.Plug.current_resource(conn),
         account: account
       )
+    else
+      conn
+      |> put_flash(:error, "Account not found")
+      |> redirect(to: "/")
+    end
+  end
+
+  def deposit(conn, %{"code" => code} = params) do
+    if account = BankAccountContext.get_account_by_code(code) do
+      case BankAccountContext.deposit_to_account(account, params) do
+        {:ok, %BankAccount{code: account_code}} ->
+          conn
+          |> put_flash(
+            :info,
+            "Deposited successfully to account number, #{account_code}."
+          )
+          |> redirect(to: Routes.client_path(conn, :view_screen, code))
+
+        {:error, %Changeset{}} ->
+          conn
+          |> put_flash(:error, "Invalid data.")
+          |> render("deposit.html",
+            user: Guardian.Plug.current_resource(conn),
+            account: account
+          )
+      end
     else
       conn
       |> put_flash(:error, "Account not found")

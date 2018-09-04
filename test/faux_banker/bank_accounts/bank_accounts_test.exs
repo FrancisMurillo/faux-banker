@@ -73,4 +73,31 @@ defmodule FauxBanker.BankAccountsTest do
                })
     end
   end
+
+  describe "Context.deposit_to_account/2" do
+    setup do
+      account = insert(:bank_account, %{})
+
+      :ok =
+        Router.dispatch(AccountAggregates |> struct(Map.from_struct(account)))
+
+      %{account: account}
+    end
+
+    @tag :positive
+    test "should work", %{account: account} do
+      %BankAccount{balance: raw_balance} = account
+      balance = Decimal.to_integer(raw_balance)
+
+      assert {:ok, %BankAccount{}} =
+               Context.deposit_to_account(account, %{
+                 amount: :rand.uniform(balance)
+               })
+    end
+
+    @tag :negative
+    test "should fail safely", %{account: account} do
+      assert {:error, %Changeset{}} = Context.deposit_to_account(account, %{})
+    end
+  end
 end

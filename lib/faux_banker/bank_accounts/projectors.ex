@@ -19,7 +19,8 @@ defmodule FauxBanker.BankAccounts.Projectors do
 
     alias Context.Accounts.Events.{
       AccountOpened,
-      AmountWithdrawn
+      AmountWithdrawn,
+      AmountDeposited
     }
 
     def error({:error, %Changeset{}}, _event, _context),
@@ -47,9 +48,22 @@ defmodule FauxBanker.BankAccounts.Projectors do
     end
 
     project %AmountWithdrawn{
-              id: id,
-              balance: balance
-            } = event do
+      id: id,
+      balance: balance
+    } do
+      multi
+      |> Multi.update(
+        :account,
+        Entity
+        |> Repo.get!(id)
+        |> Entity.update_balance_changeset(%{balance: balance})
+      )
+    end
+
+    project %AmountDeposited{
+      id: id,
+      balance: balance
+    } do
       multi
       |> Multi.update(
         :account,

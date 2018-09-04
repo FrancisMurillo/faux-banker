@@ -57,9 +57,36 @@ defmodule FauxBanker.BankAccounts.Accounts.Commands do
     alias __MODULE__, as: Command
 
     import Ecto.Changeset
-    alias UUID
 
-    alias FauxBanker.Support.Randomizer
+    alias FauxBanker.BankAccounts.BankAccount
+
+    defstruct [:id, :amount, :description]
+
+    use ExConstructor
+
+    @schema %{
+      id: :binary_id,
+      amount: :decimal,
+      description: :string
+    }
+
+    @form_fields [:amount, :description]
+
+    def changeset(%Command{} = command, %BankAccount{id: id}, attrs) do
+      {command, @schema}
+      |> cast(attrs, [:id] ++ @form_fields)
+      |> force_change(:id, id)
+      |> validate_required(@form_fields -- [:description])
+      |> validate_number(:amount, greater_than: Decimal.new(0))
+    end
+  end
+
+  defmodule DepositAmount do
+    @moduledoc nil
+
+    alias __MODULE__, as: Command
+
+    import Ecto.Changeset
 
     alias FauxBanker.BankAccounts.BankAccount
 
@@ -94,6 +121,12 @@ defmodule FauxBanker.BankAccounts.Accounts.Events do
   end
 
   defmodule AmountWithdrawn do
+    @moduledoc nil
+
+    defstruct [:id, :amount, :description, :balance]
+  end
+
+  defmodule AmountDeposited do
     @moduledoc nil
 
     defstruct [:id, :amount, :description, :balance]
