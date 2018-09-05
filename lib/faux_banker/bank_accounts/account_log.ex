@@ -34,6 +34,9 @@ defmodule FauxBanker.BankAccounts.AccountLog do
   def changeset(%Entity{} = account, attrs) do
     account
     |> cast(attrs, @fields)
-    |> validate_required(@fields -- [:request_code])
+    |> validate_required(
+      @fields --
+        [:request_code, :description, :amount, :current_balance, :next_balance]
+    )
   end
 end

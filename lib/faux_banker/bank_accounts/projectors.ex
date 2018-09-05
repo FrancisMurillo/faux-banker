@@ -22,7 +22,7 @@ defmodule FauxBanker.BankAccounts.Projectors do
       AmountWithdrawn,
       AmountDeposited,
       AmountTransferred,
-      AmountWithdrawn
+      AmountReceived
     }
 
     def error({:error, %Changeset{}}, _event, _context),
@@ -127,7 +127,7 @@ defmodule FauxBanker.BankAccounts.Projectors do
       AmountWithdrawn,
       AmountDeposited,
       AmountTransferred,
-      AmountWithdrawn
+      AmountReceived
     }
 
     defstruct []
@@ -235,7 +235,7 @@ defmodule FauxBanker.BankAccounts.Projectors do
       %BankAccount{balance: current_balance, code: code} =
         Repo.get!(BankAccount, id)
 
-      %AccountRequest{receipient_reason: reason, requst_code: code} =
+      %AccountRequest{receipient_reason: reason, code: request_code} =
         Repo.get!(AccountRequest, id)
 
       %Entity{}
@@ -264,7 +264,7 @@ defmodule FauxBanker.BankAccounts.Projectors do
       %BankAccount{balance: current_balance, code: code} =
         Repo.get!(BankAccount, id)
 
-      %AccountRequest{sender_reason: reason, requst_code: code} =
+      %AccountRequest{sender_reason: reason, code: request_code} =
         Repo.get!(AccountRequest, id)
 
       %Entity{}

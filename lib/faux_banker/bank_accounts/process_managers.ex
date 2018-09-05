@@ -13,7 +13,6 @@ defmodule FauxBanker.BankAccounts.ProcessManagers do
     alias FauxBanker.AccountRequests.Requests.Events.RequestApproved
 
     alias FauxBanker.BankAccounts, as: Context
-    alias Context.BankAccount
     alias Context.Accounts.Commands.{TransferAmount, ReceiveAmount}
 
     defstruct []
@@ -36,8 +35,8 @@ defmodule FauxBanker.BankAccounts.ProcessManagers do
       } = Repo.get!(AccountRequest, id)
 
       [
-        %TransferAmount{id: giver_id, request_id: request_id, amount: amount},
-        %ReceiveAmount{id: receiver_id, request_id: request_id, amount: amount}
+        %TransferAmount{id: giver_id, request_id: id, amount: amount},
+        %ReceiveAmount{id: receiver_id, request_id: id, amount: amount}
       ]
     end
   end
