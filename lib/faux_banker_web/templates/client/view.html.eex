@@ -31,6 +31,8 @@
       <tr>
         <th scope='col'>Date/Time</th>
         <th scope='col'>Event</th>
+        <th scope='col'>Description</th>
+        <th scope='col'>Amount</th>
         <th scope='col'>Before</th>
         <th scope='col'>After</th>
       </tr>
@@ -43,6 +45,12 @@
             </td>
             <td>
               <%= log.event %>
+            </td>
+            <td>
+              <%= log.description %>
+            </td>
+            <td>
+              <%= log.amount %>
             </td>
             <td>
               <%= log.current_balance %>
