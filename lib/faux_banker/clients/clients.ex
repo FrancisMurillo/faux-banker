@@ -28,7 +28,7 @@ defmodule FauxBanker.Clients do
     do: client_id |> Context.Queries.select_client_friends() |> Repo.all()
 
   def get_client_by_code(code),
-    do: Repo.get_by(Client, code: code, role: :client)
+    do: Client |> Repo.get_by(code: code, role: :client)
 
   def user_as_client(%User{role: :client} = user),
     do: {:ok, struct(Client, Map.from_struct(user))}

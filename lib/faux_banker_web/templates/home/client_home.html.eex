@@ -69,27 +69,33 @@
     <thead class='thead-dark'>
       <tr>
         <th scope='col'>Date/Time</th>
+        <th scope='col'>#</th>
         <th scope='col'>Status</th>
         <th scope='col'>Type</th>
         <th scope='col'>Account</th>
         <th scope='col'>Reason</th>
         <th scope='col'>Amount</th>
+        <th scope='col'>Response</th>
+        <th scope='col'>Actions</th>
       </tr>
     </thead>
     <tbody>
       <%= for request <- requests(@user.id) do %>
           <tr>
             <td>
-              <%= Timex.format!(Timex.local(request.inserted_at), "%F %T", :strftime) %>
+              <%= Timex.format!(Timex.local(request.updated_at), "%F %T", :strftime) %>
+            </td>
+            <td>
+              <%= request.code %>
             </td>
             <td>
               <%= String.upcase(Atom.to_string(request.status)) %>
             </td>
             <td>
               <%= if @user.code == request.sender.code do %>
-                SENDER
-              <%= else %>
-                RECEIPIENT
+              SENDER
+              <% else %>
+              RECEIPIENT
               <% end %>
             </td>
             <td>
@@ -103,6 +109,20 @@
             </td>
             <td>
               <%= request.receipient_reason %>
+            </td>
+            <td>
+              <%= if request.status == :pending do %>
+              <a href='<%= client_path(@conn, :approve_request_screen, request.code)
+                           %>' class='btn btn-primary btn-md active'
+                 role='button' aria-pressed='true'>
+                Approve
+              </a>
+              <a href='<%= client_path(@conn, :deny_request_screen, request.code)
+                           %>' class='btn btn-secondary btn-md active'
+                 role='button' aria-pressed='true'>
+                Deny
+              </a>
+              <% end %>
             </td>
           </tr>
           <% end %>

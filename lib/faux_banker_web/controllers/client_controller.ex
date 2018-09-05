@@ -166,4 +166,44 @@ defmodule FauxBankerWeb.ClientController do
         |> redirect(to: "/")
     end
   end
+
+  def accept_request_screen(conn, %{"code" => code}) do
+    if request = AccountRequests.get_request_by_code(code) do
+      conn
+      |> render("accept_request.html",
+        user: Guardian.Plug.current_resource(conn),
+        request: request
+      )
+    else
+      conn
+      |> put_flash(:error, "Request not found")
+      |> redirect(to: "/")
+    end
+  end
+
+  def accept_request(conn, %{"code" => code} = params) do
+    if request = AccountRequests.get_request_by_code(code) do
+      case AccountRequests.approve_request(request, params) do
+        {:ok, %AccountRequest{code: account_code}} ->
+          conn
+          |> put_flash(
+            :info,
+            "Deposited successfully to account number, #{account_code}."
+          )
+          |> redirect(to: Routes.client_path(conn, :view_screen, code))
+
+        {:error, %Changeset{}} ->
+          conn
+          |> put_flash(:error, "Invalid data.")
+          |> render("accept_request.html",
+            user: Guardian.Plug.current_resource(conn),
+            request: request
+          )
+      end
+    else
+      conn
+      |> put_flash(:error, "Request not found")
+      |> redirect(to: "/")
+    end
+  end
 end

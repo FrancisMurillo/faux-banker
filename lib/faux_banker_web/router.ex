@@ -56,6 +56,12 @@ defmodule FauxBankerWeb.Router do
     scope "/requests" do
       get("/", ClientController, :make_request_screen)
       post("/", ClientController, :make_request)
+
+      get("/:code/approve", ClientController, :approve_request_screen)
+      post("/:code/approve", ClientController, :approve_request)
+
+      get("/:code/deny", ClientController, :deny_request_screen)
+      post("/:code/deny", ClientController, :deny_request)
     end
   end
 

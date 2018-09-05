@@ -47,6 +47,9 @@ defmodule FauxBanker.AccountRequests do
   def list_client_requests_by_client_id(client_id),
     do: client_id |> Context.Queries.select_client_requests() |> Repo.all()
 
+  def get_request_by_code(code),
+    do: AccountRequest |> Repo.get_by(code: code)
+
   def make_client_request(%Client{} = client, attrs) do
     id = UUID.uuid4()
 
@@ -69,5 +72,9 @@ defmodule FauxBanker.AccountRequests do
             error
         end
     end
+  end
+
+  def approve_client_request(client, attrs) do
+    {:ok, nil}
   end
 end
