@@ -220,8 +220,6 @@ defmodule FauxBankerWeb.ClientController do
 
   def reject_request_screen(conn, %{"code" => code}) do
     if request = AccountRequests.get_request_by_code(code) do
-      %AccountRequest{sender_id: id} = request
-
       conn
       |> render("reject_request.html",
         user: Guardian.Plug.current_resource(conn),

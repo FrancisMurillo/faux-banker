@@ -97,7 +97,7 @@ defmodule FauxBanker.AccountRequests.Requests.Commands do
 
     import Ecto.Changeset
 
-    alias FauxBanker.{AccountRequests, BankAccounts, Clients}
+    alias FauxBanker.{AccountRequests, BankAccounts}
     alias AccountRequests.AccountRequest
     alias BankAccounts.BankAccount
 
@@ -121,7 +121,7 @@ defmodule FauxBanker.AccountRequests.Requests.Commands do
 
     def changeset(
           %Command{} = command,
-          %AccountRequest{id: id, amount: amount} = request,
+          %AccountRequest{id: id, amount: amount},
           attrs
         ) do
       {command, @schema}
@@ -158,9 +158,8 @@ defmodule FauxBanker.AccountRequests.Requests.Commands do
 
     import Ecto.Changeset
 
-    alias FauxBanker.{AccountRequests, BankAccounts, Clients}
+    alias FauxBanker.{AccountRequests}
     alias AccountRequests.AccountRequest
-    alias BankAccounts.BankAccount
 
     defstruct [
       :id,
@@ -179,7 +178,7 @@ defmodule FauxBanker.AccountRequests.Requests.Commands do
 
     def changeset(
           %Command{} = command,
-          %AccountRequest{id: id} = request,
+          %AccountRequest{id: id},
           attrs
         ) do
       {command, @schema}

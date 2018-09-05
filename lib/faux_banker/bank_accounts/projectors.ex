@@ -88,7 +88,7 @@ defmodule FauxBanker.BankAccounts.Projectors do
       )
     end
 
-    project %AmountWithdrawn{
+    project %AmountReceived{
       id: id,
       balance: balance
     } do

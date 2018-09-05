@@ -133,7 +133,13 @@ defmodule FauxBanker.BankAccounts.Accounts.Router do
   alias FauxBanker.BankAccounts, as: Context
   alias Context.Accounts, as: AccountSubContext
 
-  alias AccountSubContext.Commands.{OpenAccount, WithdrawAmount, DepositAmount}
+  alias AccountSubContext.Commands.{
+    OpenAccount,
+    WithdrawAmount,
+    DepositAmount,
+    TransferAmount,
+    ReceiveAmount
+  }
 
   alias AccountSubContext.Aggregates, as: State
 

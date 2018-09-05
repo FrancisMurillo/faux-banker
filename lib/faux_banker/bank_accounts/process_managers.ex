@@ -14,6 +14,7 @@ defmodule FauxBanker.BankAccounts.ProcessManagers do
 
     alias FauxBanker.BankAccounts, as: Context
     alias Context.BankAccount
+    alias Context.Accounts.Commands.{TransferAmount, ReceiveAmount}
 
     defstruct []
 
@@ -28,9 +29,16 @@ defmodule FauxBanker.BankAccounts.ProcessManagers do
       do: {:retry, 100, Map.update(context, :failures, 1, &(&1 + 1))}
 
     def handle(_state, %RequestApproved{id: id}) do
-      request = Repo.get!(AccountRequest, id)
+      %AccountRequest{
+        amount: amount,
+        sender_account_id: receiver_id,
+        receipient_account_id: giver_id
+      } = Repo.get!(AccountRequest, id)
 
-      nil
+      [
+        %TransferAmount{id: giver_id, request_id: request_id, amount: amount},
+        %ReceiveAmount{id: receiver_id, request_id: request_id, amount: amount}
+      ]
     end
   end
 end

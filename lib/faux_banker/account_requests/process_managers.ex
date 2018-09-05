@@ -67,18 +67,6 @@ defmodule FauxBanker.AccountRequests.ProcessManagers do
       """)
     end
 
-    def handle(_state, %RequestMade{id: id}) do
-      if request = Repo.get(AccountRequest, id) do
-        request
-        |> request_money_email()
-        |> Mailer.deliver_later()
-
-        nil
-      else
-        {:error, :request_not_found}
-      end
-    end
-
     def request_approved_email(%AccountRequest{} = request) do
       %AccountRequest{
         receipient_reason: reason,
@@ -106,22 +94,9 @@ defmodule FauxBanker.AccountRequests.ProcessManagers do
       """)
     end
 
-    def handle(_state, %RequestApproved{id: id}) do
-      if request = Repo.get(AccountRequest, id) do
-        request
-        |> request_approved_email()
-        |> Mailer.deliver_later()
-
-        nil
-      else
-        {:error, :request_not_found}
-      end
-    end
-
     def request_rejected_email(%AccountRequest{} = request) do
       %AccountRequest{
         receipient_reason: reason,
-        amount: amount,
         receipient: %{first_name: receipient_first_name},
         sender: %{email: email, first_name: sender_first_name},
         sender_account: %BankAccount{name: account}
@@ -143,6 +118,30 @@ defmodule FauxBanker.AccountRequests.ProcessManagers do
 
       Go back to the site and check it out.
       """)
+    end
+
+    def handle(_state, %RequestMade{id: id}) do
+      if request = Repo.get(AccountRequest, id) do
+        request
+        |> request_money_email()
+        |> Mailer.deliver_later()
+
+        nil
+      else
+        {:error, :request_not_found}
+      end
+    end
+
+    def handle(_state, %RequestApproved{id: id}) do
+      if request = Repo.get(AccountRequest, id) do
+        request
+        |> request_approved_email()
+        |> Mailer.deliver_later()
+
+        nil
+      else
+        {:error, :request_not_found}
+      end
     end
 
     def handle(_state, %RequestRejected{id: id}) do

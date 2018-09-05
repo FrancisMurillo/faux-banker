@@ -13,7 +13,6 @@ defmodule FauxBanker.AccountRequests.Requests.Aggregates do
 
   defstruct [
     :id,
-    :receipient_id,
     :status
   ]
 
@@ -76,15 +75,10 @@ defmodule FauxBanker.AccountRequests.Requests.Aggregates do
       }
 
   def apply(_state, %RequestMade{
-        id: id,
-        sender_id: sender_id,
-        sender_account_id: sender_account_id,
-        receipient_id: receipient_id,
-        amount: amount
+        id: id
       }),
       do: %State{
         id: id,
-        receipient_id: receipient_id,
         status: :pending
       }
 
