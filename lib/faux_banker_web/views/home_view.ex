@@ -13,7 +13,5 @@ defmodule FauxBankerWeb.HomeView do
     do: Clients.list_client_friends_by_id(client_id)
 
   def requests(client_id),
-    do:
-      AccountRequests.list_client_requests_by_client_id(client_id)
-      |> IO.inspect(label: "mmmm")
+    do: AccountRequests.list_client_requests_by_client_id(client_id)
 end

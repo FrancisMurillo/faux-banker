@@ -30,10 +30,10 @@ defmodule FauxBanker.AccountRequestsTest do
 
     @tag :positive
     test "should work and repeatedly", %{sender: sender, receipient: receipient} do
-      %Client{accounts: [%BankAccount{code: account_code} | _]} =
+      %Client{id: sender_id, accounts: [%BankAccount{code: account_code} | _]} =
         sender |> Repo.preload(:accounts)
 
-      %Client{code: friend_code} = receipient
+      %Client{id: receipient_id, code: friend_code} = receipient
 
       params =
         :make_request
@@ -43,8 +43,12 @@ defmodule FauxBanker.AccountRequestsTest do
         })
         |> Map.drop(["code", "id"])
 
-      assert {:ok, %AccountRequest{status: :pending}} =
-               Context.make_client_request(sender, params)
+      assert {:ok,
+              %AccountRequest{
+                status: :pending,
+                receipient_id: ^receipient_id,
+                sender_id: ^sender_id
+              }} = Context.make_client_request(sender, params)
 
       assert {:ok, %AccountRequest{}} =
                Context.make_client_request(sender, params)

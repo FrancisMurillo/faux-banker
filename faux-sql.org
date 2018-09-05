@@ -1,0 +1,185 @@
+* Read Model
+  :PROPERTIES:
+  :header-args: :engine postgresql :dbhost localhost :database faux_dev :dbuser faux_user :cmdline "-h 127.0.0.1 -p 5432"
+  :END:
+
+** Scratchpad
+
+   #+BEGIN_SRC sql
+     select * from account_requests;
+   #+END_SRC
+
+   #+RESULTS:
+   | id                                   | code       |  amount | sender_reason | receipient_reason | status | sender_id                            | receipient_id                        | sender_account_id                    | receipient_account_id | inserted_at                | updated_at                 |
+   |--------------------------------------+------------+---------+---------------+-------------------+--------+--------------------------------------+--------------------------------------+--------------------------------------+-----------------------+----------------------------+----------------------------|
+   | 0545e4bf-8cb7-4940-8afd-e79b902458e5 | DHFVBQYTGG |  5.0000 | Need money    |                   |      0 | 983be728-05f8-4440-90b1-4d11a7be88c3 | 93c21c7c-869b-4d51-a24b-2808a2c905a0 | 363697f7-1ea5-44cd-8ec8-0be1b72441d3 |                       | 2018-09-05 08:28:41.948724 | 2018-09-05 08:28:41.948732 |
+   | 137286b0-6984-441e-862c-333ecb1dc85a | CZEKPVABBS | 11.0000 | aSDS          |                   |      0 | 983be728-05f8-4440-90b1-4d11a7be88c3 | 93c21c7c-869b-4d51-a24b-2808a2c905a0 | 363697f7-1ea5-44cd-8ec8-0be1b72441d3 |                       | 2018-09-05 08:30:57.934854 | 2018-09-05 08:30:57.93486  |
+
+** Hacking Time
+
+   #+BEGIN_SRC sql
+     update bank_accounts
+     set balance = 0.0
+   #+END_SRC
+
+   #+RESULTS:
+   | UPDATE 1 |
+   |----------|
+
+** Replace Projections
+
+   #+BEGIN_SRC sql
+   select * from projection_versions;
+   #+END_SRC
+
+   #+RESULTS:
+   | projection_name | last_seen_event_number | inserted_at | updated_at |
+   |-----------------+------------------------+-------------+------------|
+
+   #+BEGIN_SRC sql
+     delete from projection_versions
+     where projection_name = 'BankAccounts.AccountManager';
+   #+END_SRC
+
+   #+RESULTS:
+   | DELETE 0 |
+   |----------|
+
+   #+BEGIN_SRC sql
+   delete from bank_accounts
+where code = 'NWYRQW'
+   #+END_SRC
+
+   #+RESULTS:
+   | DELETE 1 |
+   |----------|
+
+   #+BEGIN_SRC sql
+     truncate bank_accounts
+     restart identity;
+   #+END_SRC
+
+   #+RESULTS:
+   | TRUNCATE TABLE |
+   |----------------|
+
+   #+BEGIN_SRC sql
+     select * from projection_versions
+   #+END_SRC
+
+   #+RESULTS:
+   | projection_name             | last_seen_event_number | inserted_at                | updated_at                 |
+   |-----------------------------+------------------------+----------------------------+----------------------------|
+   | BankAccounts.AccountManager |                     -1 | 2018-09-05 01:44:50.475212 | 2018-09-05 01:46:08.816762 |
+
+   #+BEGIN_SRC sql
+     update projection_versions
+     set last_seen_event_number = -1
+     where projection_name = 'BankAccounts.AccountManager'
+   #+END_SRC
+
+   #+RESULTS:
+   | UPDATE 1 |
+   |----------|
+
+* Write Model
+  :PROPERTIES:
+  :header-args: :engine postgresql :dbhost localhost :database faux_eventstore_dev :dbuser faux_user :cmdline "-h 127.0.0.1 -p 5432"
+  :END:
+
+** Scratchpad
+
+   #+BEGIN_SRC sql
+   \d
+   #+END_SRC
+
+   #+RESULTS:
+   | List of relations |                                   |          |           |
+   |-------------------+-----------------------------------+----------+-----------|
+   | Schema            | Name                              | Type     | Owner     |
+   | public            | events                            | table    | faux_user |
+   | public            | schema_migrations                 | table    | faux_user |
+   | public            | snapshots                         | table    | faux_user |
+   | public            | stream_events                     | table    | faux_user |
+   | public            | streams                           | table    | faux_user |
+   | public            | streams_stream_id_seq             | sequence | faux_user |
+   | public            | subscriptions                     | table    | faux_user |
+   | public            | subscriptions_subscription_id_seq | sequence | faux_user |
+
+   #+BEGIN_SRC sql
+   select * from events;
+   #+END_SRC
+
+   #+RESULTS:
+   | event_id                             | event_type                                                     | causation_id                         | correlation_id                       | data                                                                                                                                                                                                                                                                                                                                                       | metadata | created_at                 |
+   |--------------------------------------+----------------------------------------------------------------+--------------------------------------+--------------------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------+----------------------------|
+   | bfe40738-f33e-413f-86c6-a431c0497705 | Elixir.FauxBanker.BankAccounts.Accounts.Aggregates             | 1837e0de-d228-4738-af36-da306a4c3a90 | cbde7af9-a29f-468b-9b09-a628ff345b00 | \x7b226964223a2235333363356334352d656432392d346539332d386130372d323437626238643531313961222c2262616c616e6365223a353035382e307d                                                                                                                                                                                                                             | \x7b7d   | 2018-09-05 01:43:50.540603 |
+   | 06c3d1b3-4c0b-4c27-9794-ada66df82cbd | Elixir.FauxBanker.BankAccounts.Accounts.Aggregates             | f7442b49-04ec-46f7-b30d-f3bf732698cf | 359bbc45-2b7f-4610-b26f-fc8b6ba0d8c8 | \x7b226964223a2237663935346564302d636261302d343234302d383033612d303538633532653335643438222c2262616c616e6365223a383130322e307d                                                                                                                                                                                                                             | \x7b7d   | 2018-09-05 01:43:50.579425 |
+   | 8e322706-6ed3-483f-af98-f26d7dabf699 | Elixir.FauxBanker.BankAccounts.Accounts.Aggregates             | 9fa7c452-9fd2-484b-b3be-b01d1e9ff5e5 | 59a7e9c4-4298-4192-8c99-eed0aeb3aa7b | \x7b226964223a2236393434303831612d346334612d343732642d396132332d366666373637393137653037222c2262616c616e6365223a383338332e307d                                                                                                                                                                                                                             | \x7b7d   | 2018-09-05 01:43:50.591844 |
+   | c80fbec5-6ac6-4f7a-930d-9b6f71f9883e | Elixir.FauxBanker.BankAccounts.Accounts.Events.AccountOpened   | cc8cfee3-580f-43b0-9df4-cf060f0ca1f5 | 21d443ef-a82f-49c9-b45f-8d7be54155ab | \x7b226e616d65223a224361742043616665222c226964223a2233316534313831642d353936632d343037322d616465342d613432626130646231656436222c226465736372697074696f6e223a22436174732052756c7a222c22636f6465223a224e5759525157222c22636c69656e745f6964223a2264323838633232342d353035642d343235352d613935392d323233353130653761383364222c2262616c616e6365223a352e3065347d | \x7b7d   | 2018-09-05 01:44:50.4457   |
+   | d5bc9e30-1e5b-47c4-bf64-08737a0ff628 | Elixir.FauxBanker.BankAccounts.Accounts.Events.AmountWithdrawn | 55d2df53-1831-443e-a01d-275a9fa7e0df | 742d230e-461c-484e-913b-586499a83dd7 | \x7b226964223a2233316534313831642d353936632d343037322d616465342d613432626130646231656436222c226465736372697074696f6e223a22536f6674204f70656e696e67222c2262616c616e6365223a342e3065342c22616d6f756e74223a312e3065347d                                                                                                                                       | \x7b7d   | 2018-09-05 01:45:04.768764 |
+   | 1733f56c-9eb8-4a54-9687-37f40791bc27 | Elixir.FauxBanker.BankAccounts.Accounts.Events.AmountWithdrawn | 2d840bd7-d875-40da-ba60-271dbea085b1 | 1fcb1e2f-0b1a-48d2-a8c1-d6a9e8b3fcc5 | \x7b226964223a2233316534313831642d353936632d343037322d616465342d613432626130646231656436222c226465736372697074696f6e223a224361747320466f6f64222c2262616c616e6365223a332e3565342c22616d6f756e74223a352e3065337d                                                                                                                                             | \x7b7d   | 2018-09-05 01:45:50.352106 |
+   | 92f48ec8-00ce-49c7-83e3-fc78a88ed057 | Elixir.FauxBanker.BankAccounts.Accounts.Events.AmountWithdrawn | 1ab68131-ef3f-45a7-a056-29039ed8b823 | a420c9b3-ecc9-4f0a-b36f-b3e41c66cd21 | \x7b226964223a2233316534313831642d353936632d343037322d616465342d613432626130646231656436222c226465736372697074696f6e223a2250617920746865206b697474656e73222c2262616c616e6365223a322e3965342c22616d6f756e74223a362e3065337d                                                                                                                                 | \x7b7d   | 2018-09-05 01:46:00.576845 |
+   | 4365d422-e21f-43f5-963f-17d010213425 | Elixir.FauxBanker.BankAccounts.Accounts.Events.AmountDeposited | dee5752b-d13e-4c92-9148-113eb78262f4 | ba6f1065-586c-4770-98b7-2536cbfa67de | \x7b226964223a2233316534313831642d353936632d343037322d616465342d613432626130646231656436222c226465736372697074696f6e223a224d616b6520736f6d65204d4f4152222c2262616c616e6365223a352e3965342c22616d6f756e74223a332e3065347d                                                                                                                                   | \x7b7d   | 2018-09-05 01:46:08.807695 |
+
+   #+BEGIN_SRC sql
+   select * from streams;
+   #+END_SRC
+
+   #+RESULTS:
+   | stream_id | stream_uuid                                       | stream_version | created_at                 |
+   |-----------+---------------------------------------------------+----------------+----------------------------|
+   |         1 | bank-account-533c5c45-ed29-4e93-8a07-247bb8d5119a |              1 | 2018-09-05 01:43:50.537679 |
+   |         2 | bank-account-7f954ed0-cba0-4240-803a-058c52e35d48 |              1 | 2018-09-05 01:43:50.575117 |
+   |         3 | bank-account-6944081a-4c4a-472d-9a23-6ff767917e07 |              1 | 2018-09-05 01:43:50.588321 |
+   |         4 | bank-account-31e4181d-596c-4072-ade4-a42ba0db1ed6 |              5 | 2018-09-05 01:44:50.442616 |
+   |         0 | $all                                              |              8 | 2018-09-05 01:43:48.679646 |
+
+   #+BEGIN_SRC sql
+   select * from subscriptions;
+   #+END_SRC
+
+   #+RESULTS:
+   | subscription_id | stream_uuid | subscription_name           | last_seen | created_at                 |
+   |-----------------+-------------+-----------------------------+-----------+----------------------------|
+   |               1 | $all        | BankAccounts.LogManager     |         8 | 2018-09-05 01:43:49.389952 |
+   |               2 | $all        | BankAccounts.AccountManager |         4 | 2018-09-05 01:43:49.390288 |
+
+   #+BEGIN_SRC sql
+   select * from subscriptions_subscription_id_seq;
+   #+END_SRC
+
+   #+RESULTS:
+   | last_value | log_cnt | is_called |
+   |------------+---------+-----------|
+   |          2 |      31 | t         |
+
+** Reset Subscriptions
+
+   #+BEGIN_SRC sql
+   update subscriptions
+   set last_seen = -1
+   where subscription_id = 2
+   #+END_SRC
+
+   #+RESULTS:
+   | UPDATE 1 |
+   |----------|
+
+* Log Model
+  :PROPERTIES:
+  :header-args: :engine mongodb :dbhost localhost :db faux_log_dev
+  :END:
+
+** Scratchpad
+
+   #+BEGIN_SRC mongo
+     db.account_logs.find()
+   #+END_SRC
+
+   #+RESULTS:
+   : { "_id" : ObjectId("5b8f3167b7c5ef221795af5a"), "amount" : 100, "code" : "XGRFAZHOIIJCIQIBEGAK", "current_balance" : 3382, "description" : "Need it for my cats", "event" : "Amount Withdrawn", "logged_at" : ISODate("2018-09-05T01:29:11.638Z"), "next_balance" : 3282 }
+   : { "_id" : ObjectId("5b8f3170b7c5ef2217426f8a"), "amount" : 700, "code" : "XGRFAZHOIIJCIQIBEGAK", "current_balance" : 3282, "description" : "Board Game Night Boys!!!", "event" : "Amount Withdrawn", "logged_at" : ISODate("2018-09-05T01:29:20.752Z"), "next_balance" : 2582 }
+   : { "_id" : ObjectId("5b8f317db7c5ef2217c12a64"), "amount" : 2500, "code" : "XGRFAZHOIIJCIQIBEGAK", "current_balance" : 2582, "description" : "Need gold", "event" : "Amount Withdrawn", "logged_at" : ISODate("2018-09-05T01:29:33.656Z"), "next_balance" : 82 }
+   : { "_id" : ObjectId("5b8f3188b7c5ef2217b4c780"), "amount" : 9999, "code" : "XGRFAZHOIIJCIQIBEGAK", "current_balance" : 82, "description" : "Moar GOLD!!", "event" : "Amount Deposited", "logged_at" : ISODate("2018-09-05T01:29:44.465Z"), "next_balance" : 10081 }
+   : { "_id" : ObjectId("5b8f3193b7c5ef2217a03867"), "amount" : 6000, "code" : "XGRFAZHOIIJCIQIBEGAK", "current_balance" : 10081, "description" : "Pay my bills", "event" : "Amount Deposited", "logged_at" : ISODate("2018-09-05T01:29:55.291Z"), "next_balance" : 16081 }

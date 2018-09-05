@@ -50,7 +50,7 @@
 
   <div class='control-group'>
     <label class='control-label'>Reason</label>
-    <input class='form-control' type='text' name='description' value='<%= @conn.params["reason"] %>' />
+    <input class='form-control' type='text' name='reason' value='<%= @conn.params["reason"] %>' />
   </div>
 
   <div class='control-group'>

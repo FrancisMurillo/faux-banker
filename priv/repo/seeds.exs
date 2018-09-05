@@ -29,6 +29,14 @@ Mongo.Ecto.truncate(LogRepo)
   password_hash: Comeonin.hashpwsalt("123456")
 })
 
+:user
+|> insert(%{
+  username: "another",
+  email: "another@email.com",
+  role: :client,
+  password_hash: Comeonin.hashpwsalt("123456")
+})
+
 BankAccount
 |> Repo.all()
 |> Enum.each(fn account ->

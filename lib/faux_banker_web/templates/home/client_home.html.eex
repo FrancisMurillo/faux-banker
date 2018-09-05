@@ -68,13 +68,41 @@
   <table class='table table-sm table-striped table-hover p-3'>
     <thead class='thead-dark'>
       <tr>
-        <th scope='col'>Name</th>
+        <th scope='col'>Date/Time</th>
+        <th scope='col'>Status</th>
+        <th scope='col'>Type</th>
+        <th scope='col'>Account</th>
+        <th scope='col'>Reason</th>
+        <th scope='col'>Amount</th>
       </tr>
     </thead>
     <tbody>
       <%= for request <- requests(@user.id) do %>
           <tr>
             <td>
+              <%= Timex.format!(Timex.local(request.inserted_at), "%F %T", :strftime) %>
+            </td>
+            <td>
+              <%= String.upcase(Atom.to_string(request.status)) %>
+            </td>
+            <td>
+              <%= if @user.code == request.sender.code do %>
+                SENDER
+              <%= else %>
+                RECEIPIENT
+              <% end %>
+            </td>
+            <td>
+              <%= request.sender_account.name %>
+            </td>
+            <td>
+              <%= request.sender_reason %>
+            </td>
+            <td>
+              <%= Decimal.round(request.amount, 2) %>
+            </td>
+            <td>
+              <%= request.receipient_reason %>
             </td>
           </tr>
           <% end %>

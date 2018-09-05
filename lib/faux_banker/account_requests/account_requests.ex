@@ -31,9 +31,10 @@ defmodule FauxBanker.AccountRequests do
           on: sb.id == a.sender_account_id,
           inner_join: r in Client,
           on: r.id == a.receipient_id,
-          inner_join: rb in BankAccount,
+          left_join: rb in BankAccount,
           on: rb.id == a.receipient_account_id,
           where: a.sender_id == ^client_id or a.receipient_id == ^client_id,
+          order_by: [desc: :updated_at],
           preload: [
             sender: s,
             sender_account: sb,

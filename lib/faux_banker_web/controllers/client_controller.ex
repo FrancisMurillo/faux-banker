@@ -8,17 +8,14 @@ defmodule FauxBankerWeb.ClientController do
   alias FauxBanker.Guardian
   alias FauxBankerWeb.Router.Helpers, as: Routes
 
-  alias FauxBanker.Accounts, as: AccountContext
-  alias FauxBanker.AccountRequests, as: AccountRequestContext
-  alias FauxBanker.BankAccounts, as: BankAccountContext
-  alias FauxBanker.Clients, as: ClientContext
+  alias FauxBanker.{Accounts, AccountRequests, BankAccounts, Clients}
 
-  alias AccountContext.{User}
-  alias AccountRequestContext.{AccountRequest}
-  alias BankAccountContext.{BankAccount}
+  alias Accounts.{User}
+  alias AccountRequests.{AccountRequest}
+  alias BankAccounts.{BankAccount}
 
   def view_screen(conn, %{"code" => code}) do
-    if account = BankAccountContext.get_account_by_code(code) do
+    if account = BankAccounts.get_account_by_code(code) do
       conn
       |> render("view.html",
         user: Guardian.Plug.current_resource(conn),
@@ -32,7 +29,7 @@ defmodule FauxBankerWeb.ClientController do
   end
 
   def withdraw_screen(conn, %{"code" => code}) do
-    if account = BankAccountContext.get_account_by_code(code) do
+    if account = BankAccounts.get_account_by_code(code) do
       conn
       |> render("withdraw.html",
         user: Guardian.Plug.current_resource(conn),
@@ -46,8 +43,8 @@ defmodule FauxBankerWeb.ClientController do
   end
 
   def withdraw(conn, %{"code" => code} = params) do
-    if account = BankAccountContext.get_account_by_code(code) do
-      case BankAccountContext.withdraw_from_account(account, params) do
+    if account = BankAccounts.get_account_by_code(code) do
+      case BankAccounts.withdraw_from_account(account, params) do
         {:ok, %BankAccount{code: account_code}} ->
           conn
           |> put_flash(
@@ -83,7 +80,7 @@ defmodule FauxBankerWeb.ClientController do
   end
 
   def deposit_screen(conn, %{"code" => code}) do
-    if account = BankAccountContext.get_account_by_code(code) do
+    if account = BankAccounts.get_account_by_code(code) do
       conn
       |> render("deposit.html",
         user: Guardian.Plug.current_resource(conn),
@@ -97,8 +94,8 @@ defmodule FauxBankerWeb.ClientController do
   end
 
   def deposit(conn, %{"code" => code} = params) do
-    if account = BankAccountContext.get_account_by_code(code) do
-      case BankAccountContext.deposit_to_account(account, params) do
+    if account = BankAccounts.get_account_by_code(code) do
+      case BankAccounts.deposit_to_account(account, params) do
         {:ok, %BankAccount{code: account_code}} ->
           conn
           |> put_flash(
@@ -126,8 +123,8 @@ defmodule FauxBankerWeb.ClientController do
     user = Guardian.Plug.current_resource(conn)
     %User{id: id} = user
 
-    accounts = BankAccountContext.list_accounts_by_client_id(id)
-    friends = ClientContext.list_client_friends_by_id(id)
+    accounts = BankAccounts.list_accounts_by_client_id(id)
+    friends = Clients.list_client_friends_by_id(id)
 
     conn
     |> render("make_request.html",
@@ -138,10 +135,11 @@ defmodule FauxBankerWeb.ClientController do
   end
 
   def make_request(conn, params) do
-    with client <-
-           ClientContext.user_as_client(Guardian.Plug.current_resource(conn)),
+    user = Guardian.Plug.current_resource(conn)
+
+    with {:ok, client} <- Clients.user_as_client(user),
          {:ok, %AccountRequest{}} <-
-           AccountRequestContext.make_client_request(client, params) do
+           AccountRequests.make_client_request(client, params) do
       conn
       |> put_flash(
         :info,
@@ -150,10 +148,16 @@ defmodule FauxBankerWeb.ClientController do
       |> redirect(to: "/")
     else
       {:error, %Changeset{}} ->
+        %User{id: id} = user
+        accounts = BankAccounts.list_accounts_by_client_id(id)
+        friends = Clients.list_client_friends_by_id(id)
+
         conn
         |> put_flash(:error, "Invalid data.")
         |> render("make_request.html",
-          user: Guardian.Plug.current_resource(conn)
+          user: Guardian.Plug.current_resource(conn),
+          accounts: accounts,
+          friends: friends
         )
 
       {:error, :invalid_user} ->
