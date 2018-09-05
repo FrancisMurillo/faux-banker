@@ -9,7 +9,6 @@ defmodule FauxBanker.AccountRequestsFactory do
 
       def make_request_factory,
         do: %{
-          code: Generator.code(),
           amount: Generator.decimal(),
           reason: Generator.description(),
           friend_code: Generator.code(),

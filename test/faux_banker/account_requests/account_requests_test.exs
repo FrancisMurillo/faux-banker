@@ -131,7 +131,6 @@ defmodule FauxBanker.AccountRequestsTest do
     test "notification email for rejecting requests should work", %{
       request: request
     } do
-      request = insert(:request, %{})
       event = struct(RequestRejected, Map.from_struct(request))
       %RequestRejected{id: id} = event
 
