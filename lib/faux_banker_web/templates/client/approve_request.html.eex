@@ -22,7 +22,7 @@
                   selected
                   <% end %>
                   >
-            <%= account.name %>
+            <%= account.name <> " ( " <> Decimal.to_string(Decimal.round(account.balance, 2)) <> " )" %>
             </option>
           <% end %>
    </select>

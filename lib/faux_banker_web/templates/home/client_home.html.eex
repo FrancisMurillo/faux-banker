@@ -111,7 +111,7 @@
               <%= request.receipient_reason %>
             </td>
             <td>
-              <%= if request.status == :pending and @user.id == request.sender_id do %>
+              <%= if request.status == :pending and @user.id == request.receipient_id do %>
               <a href='<%= client_path(@conn, :approve_request_screen, request.code)
                            %>' class='btn btn-primary btn-md active'
                  role='button' aria-pressed='true'>
