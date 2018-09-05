@@ -16,6 +16,7 @@ Mongo.Ecto.truncate(LogRepo)
 |> insert(%{
   username: "manager",
   email: "manager@email.com",
+  first_name: "Manager",
   role: :manager,
   password_hash: Comeonin.hashpwsalt("123456"),
   accounts: []
@@ -25,6 +26,7 @@ Mongo.Ecto.truncate(LogRepo)
 |> insert(%{
   username: "nobody",
   email: "nobody@email.com",
+  first_name: "Nobody",
   role: :client,
   password_hash: Comeonin.hashpwsalt("123456")
 })
@@ -33,6 +35,16 @@ Mongo.Ecto.truncate(LogRepo)
 |> insert(%{
   username: "another",
   email: "another@email.com",
+  first_name: "Another",
+  role: :client,
+  password_hash: Comeonin.hashpwsalt("123456")
+})
+
+:user
+|> insert(%{
+  username: "somebody",
+  email: "somebody@email.com",
+  first_name: "Somebody",
   role: :client,
   password_hash: Comeonin.hashpwsalt("123456")
 })
