@@ -16,7 +16,7 @@ defmodule FauxBanker.AccountRequestsTest do
 
   alias FauxBanker.AccountRequests, as: Context
   alias Context.Requests.Aggregates, as: RequestAggregates
-  alias Context.Requests.Events.{RequestMade}
+  alias Context.Requests.Events.{RequestMade, RequestApproved, RequestRejected}
   alias Context.ProcessManagers.{MailSaga}
 
   describe "Context.make_client_request/2" do
@@ -82,21 +82,62 @@ defmodule FauxBanker.AccountRequestsTest do
 
       assert {:ok, %AccountRequest{status: :approved}} =
                Context.approve_request(pending_request, params)
+
+      assert {:error, :invalid_status} =
+               Context.approve_request(pending_request, params)
+    end
+
+    @tag :negative
+    test "should fail safely", %{request: pending_request} do
+      assert {:error, %Changeset{}} =
+               Context.approve_request(pending_request, %{})
     end
   end
 
   describe "Context.MailSaga" do
     use Bamboo.Test
 
-    @tag :positive
-    test "notification email should work" do
+    setup do
       request = insert(:request, %{})
+
+      %{request: request}
+    end
+
+    @tag :positive
+    test "notification email for making requests should work", %{
+      request: request
+    } do
       event = struct(RequestMade, Map.from_struct(request))
       %RequestMade{id: id} = event
 
       assert {:start, ^id} = MailSaga.interested?(event)
       assert MailSaga.handle(nil, event) == nil
       assert_delivered_email(MailSaga.request_money_email(request))
+    end
+
+    @tag :positive
+    test "notification email for approving requests should work", %{
+      request: request
+    } do
+      event = struct(RequestApproved, Map.from_struct(request))
+      %RequestApproved{id: id} = event
+
+      assert {:continue, ^id} = MailSaga.interested?(event)
+      assert MailSaga.handle(nil, event) == nil
+      assert_delivered_email(MailSaga.request_approved_email(request))
+    end
+
+    @tag :positive
+    test "notification email for rejecting requests should work", %{
+      request: request
+    } do
+      request = insert(:request, %{})
+      event = struct(RequestRejected, Map.from_struct(request))
+      %RequestRejected{id: id} = event
+
+      assert {:continue, ^id} = MailSaga.interested?(event)
+      assert MailSaga.handle(nil, event) == nil
+      assert_delivered_email(MailSaga.request_rejected_email(request))
     end
   end
 end
