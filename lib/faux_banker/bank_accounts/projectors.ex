@@ -82,7 +82,6 @@ defmodule FauxBanker.BankAccounts.Projectors do
       router: FauxBanker.Router,
       consistency: :eventual
 
-    import Ecto.Changeset
     alias Date
     alias Decimal
     alias UUID

@@ -50,13 +50,13 @@
               <%= log.description %>
             </td>
             <td>
-              <%= log.amount %>
+              <%= Decimal.round(Decimal.new(log.amount), 2) %>
             </td>
             <td>
-              <%= log.current_balance %>
+              <%= Decimal.round(Decimal.new(log.current_balance), 2) %>
             </td>
             <td>
-              <%= log.next_balance %>
+              <%= Decimal.round(Decimal.new(log.next_balance), 2) %>
             </td>
           </tr>
           <% end %>
