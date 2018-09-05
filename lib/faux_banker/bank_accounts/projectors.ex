@@ -101,9 +101,6 @@ defmodule FauxBanker.BankAccounts.Projectors do
 
     defstruct []
 
-    def error({:error, %Changeset{}}, _event, _context),
-      do: :skip
-
     def interested?(%AccountOpened{id: id}),
       do: {:start, id}
 

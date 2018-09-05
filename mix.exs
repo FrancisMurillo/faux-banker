@@ -26,6 +26,7 @@ defmodule FauxBanker.Mixfile do
 
   defp deps do
     [
+      {:bamboo, "~> 0.8.0", override: true},
       {:bcrypt_elixir, "~> 1.0"},
       {:credo, "~> 0.10.0", only: [:dev, :test], runtime: false},
       {:comeonin, "~> 4.0"},

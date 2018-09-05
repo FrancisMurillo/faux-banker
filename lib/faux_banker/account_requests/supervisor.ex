@@ -10,7 +10,10 @@ defmodule FauxBanker.AccountRequests.Supervisor do
   def init(_arg),
     do:
       Supervisor.init(
-        [Context.Projectors.RequestManager],
+        [
+          Context.Projectors.RequestManager,
+          Context.ProcessManagers.MailSaga
+        ],
         strategy: :one_for_one
       )
 end

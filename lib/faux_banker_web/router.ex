@@ -68,8 +68,7 @@ defmodule FauxBankerWeb.Router do
     delete("/logout", AuthController, :signout)
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", FauxBankerWeb do
-  #   pipe_through :api
-  # end
+  if Mix.env() == :dev do
+    forward("/sent_emails", Bamboo.EmailPreviewPlug)
+  end
 end

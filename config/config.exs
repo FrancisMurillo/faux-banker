@@ -40,4 +40,6 @@ config :commanded,
 config :commanded_ecto_projections,
   repo: FauxBanker.Repo
 
+config :faux_banker, FauxBanker.Mailer, adapter: Bamboo.LocalAdapter
+
 import_config "#{Mix.env()}.exs"
