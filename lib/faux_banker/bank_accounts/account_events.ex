@@ -110,6 +110,22 @@ defmodule FauxBanker.BankAccounts.Accounts.Commands do
       |> validate_number(:amount, greater_than: Decimal.new(0))
     end
   end
+
+  defmodule TransferAmount do
+    @moduledoc nil
+
+    defstruct [:id, :request_id, :amount]
+
+    use ExConstructor
+  end
+
+  defmodule ReceiveAmount do
+    @moduledoc nil
+
+    defstruct [:id, :request_id, :amount]
+
+    use ExConstructor
+  end
 end
 
 defmodule FauxBanker.BankAccounts.Accounts.Events do
@@ -131,48 +147,16 @@ defmodule FauxBanker.BankAccounts.Accounts.Events do
     @derive [Poison.Encoder]
     defstruct [:id, :amount, :description, :balance]
   end
-end
 
-defimpl Commanded.Serialization.JsonDecoder,
-  for: FauxBanker.BankAccounts.Accounts.Events.AccountOpened do
-  @moduledoc nil
+  defmodule AmountTransferred do
+    @moduledoc nil
+    @derive [Poison.Encoder]
+    defstruct [:id, :request_id, :amount, :balance]
+  end
 
-  alias Decimal
-
-  alias FauxBanker.BankAccounts.Accounts.Events.AccountOpened, as: Event
-
-  def decode(%Event{balance: balance} = state),
-    do: %Event{state | balance: Decimal.new(balance)}
-end
-
-defimpl Commanded.Serialization.JsonDecoder,
-  for: FauxBanker.BankAccounts.Accounts.Events.AmountWithdrawn do
-  @moduledoc nil
-
-  alias Decimal
-
-  alias FauxBanker.BankAccounts.Accounts.Events.AmountWithdrawn, as: Event
-
-  def decode(%Event{balance: balance, amount: amount} = state),
-    do: %Event{
-      state
-      | balance: Decimal.new(balance),
-        amount: Decimal.new(amount)
-    }
-end
-
-defimpl Commanded.Serialization.JsonDecoder,
-  for: FauxBanker.BankAccounts.Accounts.Events.AmountDeposited do
-  @moduledoc nil
-
-  alias Decimal
-
-  alias FauxBanker.BankAccounts.Accounts.Events.AmountDeposited, as: Event
-
-  def decode(%Event{balance: balance, amount: amount} = state),
-    do: %Event{
-      state
-      | balance: Decimal.new(balance),
-        amount: Decimal.new(amount)
-    }
+  defmodule AmountReceived do
+    @moduledoc nil
+    @derive [Poison.Encoder]
+    defstruct [:id, :request_id, :amount, :balance]
+  end
 end

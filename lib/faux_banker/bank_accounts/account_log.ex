@@ -11,6 +11,7 @@ defmodule FauxBanker.BankAccounts.AccountLog do
   schema "account_logs" do
     field(:event, :string)
     field(:code, :string)
+    field(:request_code, :string, null: true)
     field(:description, :string)
     field(:amount, :float)
     field(:current_balance, :float)
@@ -21,6 +22,7 @@ defmodule FauxBanker.BankAccounts.AccountLog do
   @fields [
     :event,
     :code,
+    :request_code,
     :description,
     :amount,
     :current_balance,
@@ -32,8 +34,6 @@ defmodule FauxBanker.BankAccounts.AccountLog do
   def changeset(%Entity{} = account, attrs) do
     account
     |> cast(attrs, @fields)
-    |> validate_required(
-      @fields -- [:description, :amount, :current_balance, :next_balance]
-    )
+    |> validate_required(@fields -- [:request_code])
   end
 end

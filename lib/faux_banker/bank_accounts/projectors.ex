@@ -20,7 +20,9 @@ defmodule FauxBanker.BankAccounts.Projectors do
     alias Context.Accounts.Events.{
       AccountOpened,
       AmountWithdrawn,
-      AmountDeposited
+      AmountDeposited,
+      AmountTransferred,
+      AmountWithdrawn
     }
 
     def error({:error, %Changeset{}}, _event, _context),
@@ -72,6 +74,32 @@ defmodule FauxBanker.BankAccounts.Projectors do
         |> Entity.update_balance_changeset(%{balance: balance})
       )
     end
+
+    project %AmountTransferred{
+      id: id,
+      balance: balance
+    } do
+      multi
+      |> Multi.update(
+        :account,
+        Entity
+        |> Repo.get!(id)
+        |> Entity.update_balance_changeset(%{balance: balance})
+      )
+    end
+
+    project %AmountWithdrawn{
+      id: id,
+      balance: balance
+    } do
+      multi
+      |> Multi.update(
+        :account,
+        Entity
+        |> Repo.get!(id)
+        |> Entity.update_balance_changeset(%{balance: balance})
+      )
+    end
   end
 
   defmodule LogManager do
@@ -88,6 +116,8 @@ defmodule FauxBanker.BankAccounts.Projectors do
 
     alias FauxBanker.{Repo, LogRepo}
 
+    alias FauxBanker.AccountRequests.AccountRequest
+
     alias FauxBanker.BankAccounts, as: Context
     alias Context.BankAccount
     alias Context.AccountLog, as: Entity
@@ -95,7 +125,9 @@ defmodule FauxBanker.BankAccounts.Projectors do
     alias Context.Accounts.Events.{
       AccountOpened,
       AmountWithdrawn,
-      AmountDeposited
+      AmountDeposited,
+      AmountTransferred,
+      AmountWithdrawn
     }
 
     defstruct []
@@ -116,6 +148,12 @@ defmodule FauxBanker.BankAccounts.Projectors do
     def interested?(%AmountDeposited{id: id}),
       do: {:continue, id}
 
+    def interested?(%AmountTransferred{id: id}),
+      do: {:continue, id}
+
+    def interested?(%AmountReceived{id: id}),
+      do: {:continue, id}
+
     def handle(_state, %AccountOpened{code: code, balance: balance}) do
       %Entity{}
       |> Entity.changeset(%{
@@ -124,7 +162,7 @@ defmodule FauxBanker.BankAccounts.Projectors do
         description: "",
         amount: 0.0,
         current_balance: 0.0,
-        next_balance: balance |> Decimal.new() |> Decimal.to_float(),
+        next_balance: Decimal.to_float(balance),
         logged_at: DateTime.utc_now()
       })
       |> LogRepo.insert()
@@ -151,9 +189,9 @@ defmodule FauxBanker.BankAccounts.Projectors do
         event: "Amount Withdrawn",
         code: code,
         description: description,
-        amount: amount |> Decimal.to_float(),
-        current_balance: current_balance |> Decimal.to_float(),
-        next_balance: balance |> Decimal.to_float(),
+        amount: Decimal.to_float(amount),
+        current_balance: Decimal.to_float(current_balance),
+        next_balance: Decimal.to_float(balance),
         logged_at: DateTime.utc_now()
       })
       |> LogRepo.insert()
@@ -177,9 +215,67 @@ defmodule FauxBanker.BankAccounts.Projectors do
         event: "Amount Deposited",
         code: code,
         description: description,
-        amount: amount |> Decimal.to_float(),
-        current_balance: current_balance |> Decimal.to_float(),
-        next_balance: balance |> Decimal.to_float(),
+        amount: Decimal.to_float(amount),
+        current_balance: Decimal.to_float(current_balance),
+        next_balance: Decimal.to_float(balance),
+        logged_at: DateTime.utc_now()
+      })
+      |> LogRepo.insert()
+      |> case do
+        {:ok, _log} -> nil
+        error -> error
+      end
+    end
+
+    def handle(_state, %AmountTransferred{
+          id: id,
+          amount: amount,
+          balance: balance
+        }) do
+      %BankAccount{balance: current_balance, code: code} =
+        Repo.get!(BankAccount, id)
+
+      %AccountRequest{receipient_reason: reason, requst_code: code} =
+        Repo.get!(AccountRequest, id)
+
+      %Entity{}
+      |> Entity.changeset(%{
+        event: "Amount Transferred",
+        code: code,
+        request_code: request_code,
+        description: reason,
+        amount: Decimal.to_float(amount),
+        current_balance: Decimal.to_float(current_balance),
+        next_balance: Decimal.to_float(balance),
+        logged_at: DateTime.utc_now()
+      })
+      |> LogRepo.insert()
+      |> case do
+        {:ok, _log} -> nil
+        error -> error
+      end
+    end
+
+    def handle(_state, %AmountReceived{
+          id: id,
+          amount: amount,
+          balance: balance
+        }) do
+      %BankAccount{balance: current_balance, code: code} =
+        Repo.get!(BankAccount, id)
+
+      %AccountRequest{sender_reason: reason, requst_code: code} =
+        Repo.get!(AccountRequest, id)
+
+      %Entity{}
+      |> Entity.changeset(%{
+        event: "Amount Received",
+        code: code,
+        request_code: request_code,
+        description: reason,
+        amount: Decimal.to_float(amount),
+        current_balance: Decimal.to_float(current_balance),
+        next_balance: Decimal.to_float(balance),
         logged_at: DateTime.utc_now()
       })
       |> LogRepo.insert()
