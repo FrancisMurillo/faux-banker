@@ -26,37 +26,45 @@ defmodule FauxBanker.AccountRequests.ProcessManagers do
     def interested?(%RequestMade{id: id}),
       do: {:start, id}
 
+    def error({:error, _failure}, _command, %{context: %{failures: failures}})
+        when failures >= 3,
+        do: {:skip, :continue_pending}
+
+    def error({:error, _failure}, _command, %{context: context}),
+      do: {:retry, 100, Map.update(context, :failures, 1, &(&1 + 1))}
+
     def handle(_state, %RequestMade{id: id}) do
-      request =
-        AccountRequest
-        |> Repo.get!(id)
-        |> Repo.preload([:sender, :receipient, :sender_account])
+      if request = Repo.get(AccountRequest, id) do
+        %AccountRequest{
+          sender_reason: reason,
+          amount: amount,
+          receipient: %Client{email: email, first_name: receipient_first_name},
+          sender: %Client{first_name: sender_first_name},
+          sender_account: %BankAccount{name: account}
+        } =
+          request
+          |> Repo.preload([:sender, :receipient, :sender_account])
 
-      %AccountRequest{
-        sender_reason: reason,
-        amount: amount,
-        receipient: %Client{email: email, first_name: receipient_first_name},
-        sender: %Client{first_name: sender_first_name},
-        sender_account: %BankAccount{name: account}
-      } = request
+        base_email()
+        |> to(email)
+        |> subject("Request Money")
+        |> text_body("""
+        Hello #{sender_first_name},
 
-      base_email()
-      |> to(email)
-      |> subject("Request Money")
-      |> text_body("""
-      Hello #{sender_first_name},
+        Your friend, #{receipient_first_name}, needs #{Decimal.round(amount)} for his account, #{
+          account
+        }. and says...
 
-      Your friend, #{receipient_first_name}, needs #{Decimal.round(amount)} for his account, #{
-        account
-      }. and says...
+        #{reason}
 
-      #{reason}
+        Go back to the site and check it out.
+        """)
+        |> Mailer.deliver_later()
 
-      Go back to the site and check it out.
-      """)
-      |> Mailer.deliver_later()
-
-      nil
+        nil
+      else
+        {:error, :request_not_found}
+      end
     end
 
     defp base_email,

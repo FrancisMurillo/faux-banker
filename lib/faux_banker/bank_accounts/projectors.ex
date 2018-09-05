@@ -85,7 +85,6 @@ defmodule FauxBanker.BankAccounts.Projectors do
     alias Date
     alias Decimal
     alias UUID
-    alias Ecto.{Changeset}
 
     alias FauxBanker.{Repo, LogRepo}
 
@@ -100,6 +99,13 @@ defmodule FauxBanker.BankAccounts.Projectors do
     }
 
     defstruct []
+
+    def error({:error, _failure}, _command, %{context: %{failures: failures}})
+        when failures >= 3,
+        do: {:skip, :continue_pending}
+
+    def error({:error, _failure}, _command, %{context: context}),
+      do: {:retry, 100, Map.update(context, :failures, 1, &(&1 + 1))}
 
     def interested?(%AccountOpened{id: id}),
       do: {:start, id}
@@ -122,8 +128,10 @@ defmodule FauxBanker.BankAccounts.Projectors do
         logged_at: DateTime.utc_now()
       })
       |> LogRepo.insert()
-
-      nil
+      |> case do
+        {:ok, _log} -> nil
+        error -> error
+      end
     end
 
     def handle(
@@ -149,8 +157,10 @@ defmodule FauxBanker.BankAccounts.Projectors do
         logged_at: DateTime.utc_now()
       })
       |> LogRepo.insert()
-
-      nil
+      |> case do
+        {:ok, _log} -> nil
+        error -> error
+      end
     end
 
     def handle(_state, %AmountDeposited{
@@ -173,8 +183,10 @@ defmodule FauxBanker.BankAccounts.Projectors do
         logged_at: DateTime.utc_now()
       })
       |> LogRepo.insert()
-
-      nil
+      |> case do
+        {:ok, _log} -> nil
+        error -> error
+      end
     end
   end
 end
