@@ -1,14 +1,21 @@
 defmodule FauxBanker.AccountRequests do
   @moduledoc nil
 
-  alias FauxBanker.Repo
+  import Ecto.Changeset
+  alias Ecto.Changeset
+  alias UUID
+
+  alias FauxBanker.{Repo, Router}
 
   alias FauxBanker.BankAccounts.BankAccount
   alias FauxBanker.Clients.Client
 
   alias __MODULE__, as: Context
+  alias Context.Requests, as: RequestSubContext
 
-  alias Context.AccountRequest
+  alias RequestSubContext.Commands.{MakeRequest}
+
+  alias Context.{AccountRequest}
 
   defmodule Queries do
     @moduledoc nil
@@ -39,6 +46,27 @@ defmodule FauxBanker.AccountRequests do
   def list_client_requests_by_client_id(client_id),
     do: client_id |> Context.Queries.select_client_requests() |> Repo.all()
 
-  def make_client_request(%Client{} = client, params) do
+  def make_client_request(%Client{} = client, attrs) do
+    id = UUID.uuid4()
+
+    case MakeRequest.changeset(%MakeRequest{id: id}, client, attrs) do
+      %Changeset{valid?: false} = changeset ->
+        {:error, changeset}
+
+      changeset ->
+        command = apply_changes(changeset)
+
+        case Router.dispatch(command) do
+          :ok ->
+            if request = Repo.get(AccountRequest, id) do
+              {:ok, request}
+            else
+              {:error, changeset}
+            end
+
+          error ->
+            error
+        end
+    end
   end
 end

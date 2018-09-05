@@ -35,6 +35,8 @@ defmodule FauxBanker.AccountRequests.Requests.Commands do
       sender_account_id: :binary_id,
       receipient_id: :binary_id,
       code: :string,
+      account_code: :string,
+      friend_code: :string,
       amount: :decimal,
       reason: :string
     }

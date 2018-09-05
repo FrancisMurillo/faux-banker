@@ -57,7 +57,7 @@ defmodule FauxBanker.AccountRequests.AccountRequest do
   @required_fields [
     :code,
     :amount,
-    :description
+    :sender_reason
   ]
 
   @doc false
@@ -79,6 +79,7 @@ defmodule FauxBanker.AccountRequests.AccountRequest do
     |> cast(attrs, [:id] ++ @required_fields)
     |> validate_required(@required_fields)
     |> unique_constraint(:code)
+    |> force_change(:status, :pending)
     |> put_assoc(:sender, sender)
     |> put_assoc(:sender_account, sender_account)
     |> put_assoc(:receipient, receipient)

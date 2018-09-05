@@ -8,11 +8,11 @@ defmodule FauxBanker.BankAccounts do
   alias FauxBanker.{LogRepo, Repo, Router}
 
   alias __MODULE__, as: Context
-  alias Context.Accounts, as: AccountContext
+  alias Context.Accounts, as: AccountSubContext
 
   alias Context.{AccountLog, BankAccount}
 
-  alias AccountContext.Commands.{OpenAccount, WithdrawAmount, DepositAmount}
+  alias AccountSubContext.Commands.{OpenAccount, WithdrawAmount, DepositAmount}
 
   defmodule Queries do
     @moduledoc false

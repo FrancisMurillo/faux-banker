@@ -8,7 +8,7 @@ defmodule FauxBanker.Generator do
   alias UUID
 
   alias FauxBanker.Support.Randomizer
-  alias FauxBanker.Enums.Role
+  alias FauxBanker.Enums.{RequestStatus, Role}
 
   alias Faker.{
     Cat,
@@ -33,6 +33,9 @@ defmodule FauxBanker.Generator do
 
   def role(),
     do: sequence(:role, enum_keys(Role))
+
+  def request_status(),
+    do: sequence(:role, enum_keys(RequestStatus))
 
   def code(),
     do: Randomizer.randomizer(20, :upcase)
