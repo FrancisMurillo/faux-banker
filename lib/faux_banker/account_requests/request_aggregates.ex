@@ -7,16 +7,15 @@ defmodule FauxBanker.AccountRequests.Requests.Aggregates do
 
   alias Decimal
 
-  alias RequestSubContext.Commands.{MakeRequest}
+  alias RequestSubContext.Commands.{MakeRequest, ApproveRequest}
 
-  alias RequestSubContext.Events.{RequestMade}
+  alias RequestSubContext.Events.{RequestMade, RequestApproved}
 
   defstruct [
     :id,
     :sender_id,
     :sender_account_id,
     :receipient_id,
-    :receipient_account_id,
     :amount,
     :status
   ]
@@ -51,6 +50,21 @@ defmodule FauxBanker.AccountRequests.Requests.Aggregates do
         sender_reason: sender_reason
       }
 
+  def execute(%State{status: status}, %ApproveRequest{})
+      when status != :pending,
+      do: {:error, :invalid_status}
+
+  def execute(_state, %ApproveRequest{
+        id: id,
+        receipient_account_id: receipient_account_id,
+        reason: reason
+      }),
+      do: %RequestApproved{
+        id: id,
+        receipient_account_id: receipient_account_id,
+        receipient_reason: reason
+      }
+
   def apply(_state, %RequestMade{
         id: id,
         sender_id: sender_id,
@@ -66,6 +80,9 @@ defmodule FauxBanker.AccountRequests.Requests.Aggregates do
         status: :pending,
         amount: amount
       }
+
+  def apply(state, %RequestApproved{}),
+    do: %{state | status: :approved}
 end
 
 defmodule FauxBanker.AccountRequests.Requests.Router do
@@ -74,7 +91,7 @@ defmodule FauxBanker.AccountRequests.Requests.Router do
   alias FauxBanker.AccountRequests, as: Context
   alias Context.Requests, as: RequestSubContext
 
-  alias RequestSubContext.Commands.{MakeRequest}
+  alias RequestSubContext.Commands.{MakeRequest, ApproveRequest}
 
   alias RequestSubContext.Aggregates, as: State
 
@@ -86,7 +103,8 @@ defmodule FauxBanker.AccountRequests.Requests.Router do
 
   dispatch(
     [
-      MakeRequest
+      MakeRequest,
+      ApproveRequest
     ],
     to: State
   )

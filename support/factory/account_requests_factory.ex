@@ -11,6 +11,19 @@ defmodule FauxBanker.AccountRequestsFactory do
         do: %{
           code: Generator.code(),
           amount: Generator.decimal(),
+          reason: Generator.description(),
+          friend_code: Generator.code(),
+          account_code: Generator.code()
+        }
+
+      def approve_request_factory,
+        do: %{
+          account_code: Generator.code(),
+          reason: Generator.description()
+        }
+
+      def reject_request_factory,
+        do: %{
           reason: Generator.description()
         }
 

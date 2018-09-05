@@ -5,7 +5,7 @@ defmodule FauxBanker.AccountRequestsTest do
   alias Ecto.Changeset
 
   import FauxBanker.Factory
-  alias FauxBanker.{Repo}
+  alias FauxBanker.{Repo, Router}
 
   alias FauxBanker.Clients
   alias FauxBanker.Clients.Client
@@ -15,6 +15,7 @@ defmodule FauxBanker.AccountRequestsTest do
   alias FauxBanker.BankAccounts.BankAccount
 
   alias FauxBanker.AccountRequests, as: Context
+  alias Context.Requests.Aggregates, as: RequestAggregates
   alias Context.Requests.Events.{RequestMade}
   alias Context.ProcessManagers.{MailSaga}
 
@@ -37,12 +38,10 @@ defmodule FauxBanker.AccountRequestsTest do
       %Client{id: receipient_id, code: friend_code} = receipient
 
       params =
-        :make_request
-        |> string_params_for(%{
+        string_params_for(:make_request, %{
           account_code: account_code,
           friend_code: friend_code
         })
-        |> Map.drop(["code", "id"])
 
       assert {:ok,
               %AccountRequest{
@@ -58,6 +57,31 @@ defmodule FauxBanker.AccountRequestsTest do
     @tag :negative
     test "should fail safely", %{sender: sender} do
       assert {:error, %Changeset{}} = Context.make_client_request(sender, %{})
+    end
+  end
+
+  describe "Context.approve_request/2" do
+    setup do
+      pending_request =
+        insert(:request, %{status: :pending, amount: Decimal.new(1)})
+
+      :ok =
+        RequestAggregates
+        |> struct(Map.from_struct(pending_request))
+        |> Router.dispatch()
+
+      %{request: pending_request}
+    end
+
+    @tag :positive
+    test "should work and only once", %{request: pending_request} do
+      %AccountRequest{receipient_account: %BankAccount{code: code}} =
+        pending_request
+
+      params = string_params_for(:approve_request, %{account_code: code})
+
+      assert {:ok, %AccountRequest{status: :approved}} =
+               Context.approve_request(pending_request, params)
     end
   end
 

@@ -19,7 +19,9 @@ defmodule FauxBanker.AccountRequests.Projectors do
     alias Context.AccountRequest, as: Entity
 
     alias Context.Requests.Events.{
-      RequestMade
+      RequestMade,
+      RequestApproved,
+      RequestRejected
     }
 
     def error({:error, %Changeset{}}, _event, _context),
@@ -49,6 +51,37 @@ defmodule FauxBanker.AccountRequests.Projectors do
           receipient,
           %{code: code, sender_reason: sender_reason, amount: amount}
         )
+      )
+    end
+
+    project %RequestApproved{
+      id: id,
+      receipient_reason: receipient_reason,
+      receipient_account_id: receipient_account_id
+    } do
+      receipient_account = Repo.get!(BankAccount, receipient_account_id)
+
+      multi
+      |> Multi.update(
+        :request,
+        Entity
+        |> Repo.get!(id)
+        |> Entity.approve_request_changeset(
+          receipient_account,
+          %{receipient_reason: receipient_reason}
+        )
+      )
+    end
+
+    project %RequestRejected{id: id, receipient_reason: receipient_reason} do
+      multi
+      |> Multi.update(
+        :request,
+        Entity
+        |> Repo.get!(id)
+        |> Entity.reject_request_changeset(%{
+          receipient_reason: receipient_reason
+        })
       )
     end
   end

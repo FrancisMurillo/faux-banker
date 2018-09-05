@@ -7,6 +7,8 @@ defmodule FauxBanker.AccountRequests.AccountRequest do
 
   import Ecto.Changeset
 
+  alias FauxBanker.Repo
+
   alias FauxBanker.BankAccounts.BankAccount
   alias FauxBanker.Clients.Client
 
@@ -83,5 +85,28 @@ defmodule FauxBanker.AccountRequests.AccountRequest do
     |> put_assoc(:sender, sender)
     |> put_assoc(:sender_account, sender_account)
     |> put_assoc(:receipient, receipient)
+  end
+
+  def approve_request_changeset(
+        %Entity{} = request,
+        %BankAccount{} = receipient_account,
+        attrs
+      ) do
+    request
+    |> Repo.preload([:receipient_account])
+    |> cast(attrs, [:receipient_reason])
+    |> validate_required([:receipient_reason])
+    |> force_change(:status, :approved)
+    |> put_assoc(:receipient_account, receipient_account)
+  end
+
+  def reject_request_changeset(
+        %Entity{} = request,
+        attrs
+      ) do
+    request
+    |> cast(attrs, [:receipient_reason])
+    |> validate_required([:receipient_reason])
+    |> force_change(:status, :rejected)
   end
 end

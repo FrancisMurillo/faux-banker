@@ -117,10 +117,10 @@
                  role='button' aria-pressed='true'>
                 Approve
               </a>
-              <a href='<%= client_path(@conn, :deny_request_screen, request.code)
+              <a href='<%= client_path(@conn, :reject_request_screen, request.code)
                            %>' class='btn btn-secondary btn-md active'
                  role='button' aria-pressed='true'>
-                Deny
+                Reject
               </a>
               <% end %>
             </td>

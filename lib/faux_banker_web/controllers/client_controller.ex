@@ -167,12 +167,17 @@ defmodule FauxBankerWeb.ClientController do
     end
   end
 
-  def accept_request_screen(conn, %{"code" => code}) do
+  def approve_request_screen(conn, %{"code" => code}) do
     if request = AccountRequests.get_request_by_code(code) do
+      %AccountRequest{sender_id: id} = request
+
+      accounts = BankAccounts.list_accounts_by_client_id(id)
+
       conn
-      |> render("accept_request.html",
+      |> render("approve_request.html",
         user: Guardian.Plug.current_resource(conn),
-        request: request
+        request: request,
+        accounts: accounts
       )
     else
       conn
@@ -181,7 +186,7 @@ defmodule FauxBankerWeb.ClientController do
     end
   end
 
-  def accept_request(conn, %{"code" => code} = params) do
+  def approve_request(conn, %{"code" => code} = params) do
     if request = AccountRequests.get_request_by_code(code) do
       case AccountRequests.approve_request(request, params) do
         {:ok, %AccountRequest{code: account_code}} ->
@@ -195,7 +200,7 @@ defmodule FauxBankerWeb.ClientController do
         {:error, %Changeset{}} ->
           conn
           |> put_flash(:error, "Invalid data.")
-          |> render("accept_request.html",
+          |> render("approve_request.html",
             user: Guardian.Plug.current_resource(conn),
             request: request
           )

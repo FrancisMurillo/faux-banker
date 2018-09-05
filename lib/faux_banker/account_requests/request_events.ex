@@ -12,8 +12,8 @@ defmodule FauxBanker.AccountRequests.Requests.Commands do
     alias FauxBanker.Support.Randomizer
 
     alias FauxBanker.{BankAccounts, Clients}
-    alias FauxBanker.BankAccounts.BankAccount
-    alias FauxBanker.Clients.Client
+    alias BankAccounts.BankAccount
+    alias Clients.Client
 
     defstruct [
       :id,
@@ -89,6 +89,68 @@ defmodule FauxBanker.AccountRequests.Requests.Commands do
           end).()
     end
   end
+
+  defmodule ApproveRequest do
+    @moduledoc nil
+
+    alias __MODULE__, as: Command
+
+    import Ecto.Changeset
+
+    alias FauxBanker.{AccountRequests, BankAccounts, Clients}
+    alias AccountRequests.AccountRequest
+    alias BankAccounts.BankAccount
+
+    defstruct [
+      :id,
+      :receipient_account_id,
+      :account_code,
+      :reason
+    ]
+
+    use ExConstructor
+
+    @schema %{
+      id: :binary_id,
+      receipient_account_id: :binary_id,
+      account_code: :string,
+      amount: :decimal,
+      reason: :string
+    }
+
+    @form_fields [:account_code, :reason]
+
+    def changeset(
+          %Command{} = command,
+          %AccountRequest{id: id, amount: amount} = request,
+          attrs
+        ) do
+      {command, @schema}
+      |> cast(attrs, Map.keys(@schema))
+      |> validate_required(@form_fields)
+      |> force_change(:id, id)
+      |> (fn changeset ->
+            changeset
+            |> get_change(:account_code, "")
+            |> BankAccounts.get_account_by_code()
+            |> case do
+              %BankAccount{id: id, balance: balance} ->
+                if Decimal.cmp(amount, balance) == :gt do
+                  add_error(
+                    changeset,
+                    :account_code,
+                    "Account does not have enough balance."
+                  )
+                else
+                  force_change(changeset, :receipient_account_id, id)
+                end
+
+              _ ->
+                add_error(changeset, :account_code, "Account is invalid")
+            end
+          end).()
+    end
+  end
 end
 
 defmodule FauxBanker.AccountRequests.Requests.Events do
@@ -104,6 +166,23 @@ defmodule FauxBanker.AccountRequests.Requests.Events do
       :code,
       :amount,
       :sender_reason
+    ]
+  end
+
+  defmodule RequestApproved do
+    @moduledoc nil
+    defstruct [
+      :id,
+      :receipient_account_id,
+      :receipient_reason
+    ]
+  end
+
+  defmodule RequestRejected do
+    @moduledoc nil
+    defstruct [
+      :id,
+      :receipient_reason
     ]
   end
 end

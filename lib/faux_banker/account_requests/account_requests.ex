@@ -13,7 +13,7 @@ defmodule FauxBanker.AccountRequests do
   alias __MODULE__, as: Context
   alias Context.Requests, as: RequestSubContext
 
-  alias RequestSubContext.Commands.{MakeRequest}
+  alias RequestSubContext.Commands.{MakeRequest, ApproveRequest}
 
   alias Context.{AccountRequest}
 
@@ -74,7 +74,25 @@ defmodule FauxBanker.AccountRequests do
     end
   end
 
-  def approve_client_request(client, attrs) do
-    {:ok, nil}
+  def approve_request(%AccountRequest{id: id} = request, attrs) do
+    case ApproveRequest.changeset(%ApproveRequest{id: id}, request, attrs) do
+      %Changeset{valid?: false} = changeset ->
+        {:error, changeset}
+
+      changeset ->
+        command = apply_changes(changeset)
+
+        case Router.dispatch(command) do
+          :ok ->
+            if request = Repo.get(AccountRequest, id) do
+              {:ok, request}
+            else
+              {:error, changeset}
+            end
+
+          error ->
+            error
+        end
+    end
   end
 end
