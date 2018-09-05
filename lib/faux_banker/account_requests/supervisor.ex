@@ -1,7 +1,7 @@
-defmodule FauxBanker.BankAccounts.Supervisor do
+defmodule FauxBanker.AccountRequests.Supervisor do
   @moduledoc nil
 
-  alias FauxBanker.BankAccounts, as: Context
+  alias FauxBanker.AccountRequests, as: Context
 
   use Supervisor
 
@@ -10,10 +10,7 @@ defmodule FauxBanker.BankAccounts.Supervisor do
   def init(_arg),
     do:
       Supervisor.init(
-        [
-          Context.Projectors.AccountManager,
-          Context.Projectors.LogManager
-        ],
+        [Context.Projectors.RequestManager],
         strategy: :one_for_one
       )
 end

@@ -1,14 +1,14 @@
 defmodule FauxBanker.BankAccounts do
   @moduledoc false
 
-  alias __MODULE__, as: Context
-  alias Context.Accounts, as: AccountContext
-
   import Ecto.Changeset
   alias Ecto.Changeset
   alias UUID
 
   alias FauxBanker.{LogRepo, Repo, Router}
+
+  alias __MODULE__, as: Context
+  alias Context.Accounts, as: AccountContext
 
   alias Context.{AccountLog, BankAccount}
 

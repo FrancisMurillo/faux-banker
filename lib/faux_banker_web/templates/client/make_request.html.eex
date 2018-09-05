@@ -1,0 +1,62 @@
+<%= render FauxBankerWeb.LayoutView, "header.html", assigns %>
+<%= render FauxBankerWeb.LayoutView, "alert.html", assigns %>
+
+<a href='/' class='btn btn-secondary m-1' tabindex='-1' role='button'
+   aria-disabled='true'>
+  Back
+</a>
+
+<div class='container-fluid p-3'>
+  <p class='h3'>Make Request</p>
+
+  <%= form_tag client_path(@conn, :make_request), method: "post" do %>
+
+  <div class='form-group'>
+   <label class='control-label'>Account</label>
+   <select class='form-control' name='account_code'>
+     <option />
+      <%= for account <- @accounts do %>
+          <option value='<%= account.code %>'
+                  <%= if @conn.params["account_code"] == account.code do %>
+                  selected
+                  <% end %>
+                  >
+            <%= account.name %>
+            </option>
+          <% end %>
+   </select>
+  </div>
+
+  <div class='form-group'>
+   <label class='control-label'>Friend</label>
+   <select class='form-control' name='friend_code'>
+     <option />
+      <%= for friend <- @friends do %>
+          <option value='<%= friend.code %>'
+                  <%= if @conn.params["friend_code"] == friend.code do %>
+                  selected
+                  <% end %>
+                  >
+            <%= friend.first_name <> " " <> friend.last_name %>
+            </option>
+          <% end %>
+   </select>
+  </div>
+
+  <div class='control-group'>
+    <label class='control-label'>Amount</label>
+    <input class='form-control' type='number' name='amount' value='<%= @conn.params["amount"] %>' />
+  </div>
+
+  <div class='control-group'>
+    <label class='control-label'>Reason</label>
+    <input class='form-control' type='text' name='description' value='<%= @conn.params["sender_reason"] %>' />
+  </div>
+
+  <div class='control-group'>
+    <button class='btn btn-primary'>
+      Make Request
+    </button>
+  </div>
+  <% end %>
+</div>

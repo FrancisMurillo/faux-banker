@@ -7,7 +7,7 @@ defmodule FauxBanker.Repo.Migrations.CreateBankAccounts do
       add(:code, :string)
       add(:name, :citext, null: false)
       add(:description, :string)
-      add(:balance, :decimal, null: false, precision: 10, scale: 4)
+      add(:balance, :decimal, null: false, precision: 15, scale: 4)
 
       add(:client_id, references(:users, column: :id, type: :binary_id))
       timestamps()

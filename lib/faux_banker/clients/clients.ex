@@ -1,9 +1,11 @@
 defmodule FauxBanker.Clients do
   @moduledoc false
 
+  alias FauxBanker.Repo
+
   alias __MODULE__, as: Context
 
-  alias FauxBanker.Repo
+  alias FauxBanker.Accounts.User
 
   alias Context.Client
 
@@ -22,9 +24,15 @@ defmodule FauxBanker.Clients do
   def list_clients(),
     do: Context.Queries.select_clients() |> Repo.all()
 
-  def list_client_friends(client_id),
+  def list_client_friends_by_id(client_id),
     do: client_id |> Context.Queries.select_client_friends() |> Repo.all()
 
   def get_client_by_code(code),
     do: Repo.get_by(Client, code: code, role: :client)
+
+  def user_as_client(%User{role: :client} = user),
+    do: {:ok, struct(Client, Map.from_struct(user))}
+
+  def user_as_client(_),
+    do: {:error, :invalid_user}
 end

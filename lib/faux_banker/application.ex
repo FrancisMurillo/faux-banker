@@ -8,6 +8,7 @@ defmodule FauxBanker.Application do
       supervisor(FauxBanker.Repo, []),
       supervisor(FauxBanker.LogRepo, []),
       supervisor(FauxBankerWeb.Endpoint, []),
+      supervisor(FauxBanker.AccountRequests.Supervisor, []),
       supervisor(FauxBanker.BankAccounts.Supervisor, [])
     ]
 

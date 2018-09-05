@@ -52,6 +52,11 @@ defmodule FauxBankerWeb.Router do
       get("/:code/deposit", ClientController, :deposit_screen)
       post("/:code/deposit", ClientController, :deposit)
     end
+
+    scope "/requests" do
+      get("/", ClientController, :make_request_screen)
+      post("/", ClientController, :make_request)
+    end
   end
 
   scope "/auth", FauxBankerWeb do
