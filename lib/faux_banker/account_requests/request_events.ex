@@ -114,7 +114,6 @@ defmodule FauxBanker.AccountRequests.Requests.Commands do
       id: :binary_id,
       receipient_account_id: :binary_id,
       account_code: :string,
-      amount: :decimal,
       reason: :string
     }
 
@@ -149,6 +148,44 @@ defmodule FauxBanker.AccountRequests.Requests.Commands do
                 add_error(changeset, :account_code, "Account is invalid")
             end
           end).()
+    end
+  end
+
+  defmodule RejectRequest do
+    @moduledoc nil
+
+    alias __MODULE__, as: Command
+
+    import Ecto.Changeset
+
+    alias FauxBanker.{AccountRequests, BankAccounts, Clients}
+    alias AccountRequests.AccountRequest
+    alias BankAccounts.BankAccount
+
+    defstruct [
+      :id,
+      :account_code,
+      :reason
+    ]
+
+    use ExConstructor
+
+    @schema %{
+      id: :binary_id,
+      reason: :string
+    }
+
+    @form_fields [:reason]
+
+    def changeset(
+          %Command{} = command,
+          %AccountRequest{id: id} = request,
+          attrs
+        ) do
+      {command, @schema}
+      |> cast(attrs, Map.keys(@schema))
+      |> validate_required(@form_fields)
+      |> force_change(:id, id)
     end
   end
 end

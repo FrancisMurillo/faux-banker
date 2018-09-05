@@ -94,6 +94,40 @@ defmodule FauxBanker.AccountRequestsTest do
     end
   end
 
+  describe "Context.reject_request/2" do
+    setup do
+      pending_request =
+        insert(:request, %{status: :pending, amount: Decimal.new(1)})
+
+      :ok =
+        RequestAggregates
+        |> struct(Map.from_struct(pending_request))
+        |> Router.dispatch()
+
+      %{request: pending_request}
+    end
+
+    @tag :positive
+    test "should work and only once", %{request: pending_request} do
+      %AccountRequest{receipient_account: %BankAccount{code: code}} =
+        pending_request
+
+      params = string_params_for(:reject_request, %{account_code: code})
+
+      assert {:ok, %AccountRequest{status: :rejected}} =
+               Context.reject_request(pending_request, params)
+
+      assert {:error, :invalid_status} =
+               Context.reject_request(pending_request, params)
+    end
+
+    @tag :negative
+    test "should fail safely", %{request: pending_request} do
+      assert {:error, %Changeset{}} =
+               Context.reject_request(pending_request, %{})
+    end
+  end
+
   describe "Context.MailSaga" do
     use Bamboo.Test
 

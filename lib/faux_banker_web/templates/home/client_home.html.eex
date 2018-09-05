@@ -92,7 +92,7 @@
               <%= String.upcase(Atom.to_string(request.status)) %>
             </td>
             <td>
-              <%= if @user.code == request.sender.code do %>
+              <%= if @user.id == request.sender_id do %>
               SENDER
               <% else %>
               RECEIPIENT
@@ -111,7 +111,7 @@
               <%= request.receipient_reason %>
             </td>
             <td>
-              <%= if request.status == :pending do %>
+              <%= if request.status == :pending and @user.id == request.sender_id do %>
               <a href='<%= client_path(@conn, :approve_request_screen, request.code)
                            %>' class='btn btn-primary btn-md active'
                  role='button' aria-pressed='true'>

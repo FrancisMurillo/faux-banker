@@ -189,13 +189,61 @@ defmodule FauxBankerWeb.ClientController do
   def approve_request(conn, %{"code" => code} = params) do
     if request = AccountRequests.get_request_by_code(code) do
       case AccountRequests.approve_request(request, params) do
-        {:ok, %AccountRequest{code: account_code}} ->
+        {:ok, %AccountRequest{code: request_code}} ->
           conn
           |> put_flash(
             :info,
-            "Deposited successfully to account number, #{account_code}."
+            "Request successfully approved, #{request_code}."
           )
-          |> redirect(to: Routes.client_path(conn, :view_screen, code))
+          |> redirect(to: "/")
+
+        {:error, %Changeset{}} ->
+          user = Guardian.Plug.current_resource(conn)
+          %User{id: id} = user
+
+          accounts = BankAccounts.list_accounts_by_client_id(id)
+
+          conn
+          |> put_flash(:error, "Invalid data.")
+          |> render("approve_request.html",
+            user: user,
+            accounts: accounts,
+            request: request
+          )
+      end
+    else
+      conn
+      |> put_flash(:error, "Request not found")
+      |> redirect(to: "/")
+    end
+  end
+
+  def reject_request_screen(conn, %{"code" => code}) do
+    if request = AccountRequests.get_request_by_code(code) do
+      %AccountRequest{sender_id: id} = request
+
+      conn
+      |> render("reject_request.html",
+        user: Guardian.Plug.current_resource(conn),
+        request: request
+      )
+    else
+      conn
+      |> put_flash(:error, "Request not found")
+      |> redirect(to: "/")
+    end
+  end
+
+  def reject_request(conn, %{"code" => code} = params) do
+    if request = AccountRequests.get_request_by_code(code) do
+      case AccountRequests.reject_request(request, params) do
+        {:ok, %AccountRequest{code: request_code}} ->
+          conn
+          |> put_flash(
+            :info,
+            "Request successfully rejected, #{request_code}."
+          )
+          |> redirect(to: "/")
 
         {:error, %Changeset{}} ->
           conn
