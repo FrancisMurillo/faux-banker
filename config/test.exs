@@ -34,3 +34,5 @@ config :eventstore, EventStore.Storage,
   pool_overflow: 5
 
 config :bcrypt_elixir, log_rounds: 4
+
+config :faux_banker, FauxBanker.Mailer, adapter: Bamboo.TestAdapter

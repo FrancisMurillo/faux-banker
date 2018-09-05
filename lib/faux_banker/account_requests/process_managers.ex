@@ -12,7 +12,6 @@ defmodule FauxBanker.AccountRequests.ProcessManagers do
     alias FauxBanker.{Mailer, Repo}
 
     alias FauxBanker.BankAccounts.BankAccount
-    alias FauxBanker.Clients.Client
 
     alias FauxBanker.AccountRequests, as: Context
     alias Context.AccountRequest
@@ -33,32 +32,37 @@ defmodule FauxBanker.AccountRequests.ProcessManagers do
     def error({:error, _failure}, _command, %{context: context}),
       do: {:retry, 100, Map.update(context, :failures, 1, &(&1 + 1))}
 
+    def request_money_email(%AccountRequest{} = request) do
+      %AccountRequest{
+        sender_reason: reason,
+        amount: amount,
+        receipient: %{email: email, first_name: receipient_first_name},
+        sender: %{first_name: sender_first_name},
+        sender_account: %BankAccount{name: account}
+      } =
+        request
+        |> Repo.preload([:sender, :receipient, :sender_account])
+
+      base_email()
+      |> to(email)
+      |> subject("Request Money")
+      |> text_body("""
+      Hello #{sender_first_name},
+
+      Your friend, #{receipient_first_name}, needs #{Decimal.round(amount)} for his account, #{
+        account
+      }. and says...
+
+      #{reason}
+
+      Go back to the site and check it out.
+      """)
+    end
+
     def handle(_state, %RequestMade{id: id}) do
       if request = Repo.get(AccountRequest, id) do
-        %AccountRequest{
-          sender_reason: reason,
-          amount: amount,
-          receipient: %Client{email: email, first_name: receipient_first_name},
-          sender: %Client{first_name: sender_first_name},
-          sender_account: %BankAccount{name: account}
-        } =
-          request
-          |> Repo.preload([:sender, :receipient, :sender_account])
-
-        base_email()
-        |> to(email)
-        |> subject("Request Money")
-        |> text_body("""
-        Hello #{sender_first_name},
-
-        Your friend, #{receipient_first_name}, needs #{Decimal.round(amount)} for his account, #{
-          account
-        }. and says...
-
-        #{reason}
-
-        Go back to the site and check it out.
-        """)
+        request
+        |> request_money_email()
         |> Mailer.deliver_later()
 
         nil

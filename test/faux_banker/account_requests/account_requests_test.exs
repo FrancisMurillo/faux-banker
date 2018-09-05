@@ -5,7 +5,7 @@ defmodule FauxBanker.AccountRequestsTest do
   alias Ecto.Changeset
 
   import FauxBanker.Factory
-  alias FauxBanker.{Repo, Router}
+  alias FauxBanker.{Repo}
 
   alias FauxBanker.Clients
   alias FauxBanker.Clients.Client
@@ -15,7 +15,8 @@ defmodule FauxBanker.AccountRequestsTest do
   alias FauxBanker.BankAccounts.BankAccount
 
   alias FauxBanker.AccountRequests, as: Context
-  alias Context.Requests.Aggregates, as: RequestAggregates
+  alias Context.Requests.Events.{RequestMade}
+  alias Context.ProcessManagers.{MailSaga}
 
   describe "Context.make_client_request/2" do
     setup do
@@ -57,6 +58,21 @@ defmodule FauxBanker.AccountRequestsTest do
     @tag :negative
     test "should fail safely", %{sender: sender} do
       assert {:error, %Changeset{}} = Context.make_client_request(sender, %{})
+    end
+  end
+
+  describe "Context.MailSaga" do
+    use Bamboo.Test
+
+    @tag :positive
+    test "notification email should work" do
+      request = insert(:request, %{})
+      event = struct(RequestMade, Map.from_struct(request))
+      %RequestMade{id: id} = event
+
+      assert {:start, ^id} = MailSaga.interested?(event)
+      assert MailSaga.handle(nil, event) == nil
+      assert_delivered_email(MailSaga.request_money_email(request))
     end
   end
 end
