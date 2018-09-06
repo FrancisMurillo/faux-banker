@@ -13,6 +13,7 @@ defmodule FauxBanker.AccountRequestsTest do
   alias FauxBanker.Accounts.User
   alias FauxBanker.AccountRequests.AccountRequest
   alias FauxBanker.BankAccounts.BankAccount
+  alias FauxBanker.BankAccounts.Accounts.Aggregates, as: BankAccountAggregates
 
   alias FauxBanker.AccountRequests, as: Context
   alias Context.Requests.Aggregates, as: RequestAggregates
@@ -65,9 +66,24 @@ defmodule FauxBanker.AccountRequestsTest do
       pending_request =
         insert(:request, %{status: :pending, amount: Decimal.new(1)})
 
+      %AccountRequest{
+        receipient_account: receipient_account,
+        sender_account: sender_account
+      } = pending_request
+
       :ok =
         RequestAggregates
         |> struct(Map.from_struct(pending_request))
+        |> Router.dispatch()
+
+      :ok =
+        BankAccountAggregates
+        |> struct(Map.from_struct(receipient_account))
+        |> Router.dispatch()
+
+      :ok =
+        BankAccountAggregates
+        |> struct(Map.from_struct(sender_account))
         |> Router.dispatch()
 
       %{request: pending_request}
@@ -92,6 +108,38 @@ defmodule FauxBanker.AccountRequestsTest do
       assert {:error, %Changeset{}} =
                Context.approve_request(pending_request, %{})
     end
+
+    @tag :integration
+    test "should transfer amounts", %{request: pending_request} do
+      %AccountRequest{
+        receipient_account: receipient_account,
+        sender_account: sender_account
+      } = pending_request
+
+      %BankAccount{code: code} = receipient_account
+
+      params = string_params_for(:approve_request, %{account_code: code})
+
+      assert {:ok, request} = Context.approve_request(pending_request, params)
+
+      assert %AccountRequest{
+               status: :approved,
+               receipient_account: updated_receipient_account,
+               sender_account: updated_sender_account
+             } =
+               request
+               |> Repo.preload([:receipient_account, :sender_account],
+                 force: true
+               )
+
+      assert Decimal.cmp(updated_sender_account.balance, sender_account.balance) ==
+               :gt
+
+      assert Decimal.cmp(
+               updated_receipient_account.balance,
+               receipient_account.balance
+             ) == :lt
+    end
   end
 
   describe "Context.reject_request/2" do
@@ -99,9 +147,24 @@ defmodule FauxBanker.AccountRequestsTest do
       pending_request =
         insert(:request, %{status: :pending, amount: Decimal.new(1)})
 
+      %AccountRequest{
+        receipient_account: receipient_account,
+        sender_account: sender_account
+      } = pending_request
+
       :ok =
         RequestAggregates
         |> struct(Map.from_struct(pending_request))
+        |> Router.dispatch()
+
+      :ok =
+        BankAccountAggregates
+        |> struct(Map.from_struct(receipient_account))
+        |> Router.dispatch()
+
+      :ok =
+        BankAccountAggregates
+        |> struct(Map.from_struct(sender_account))
         |> Router.dispatch()
 
       %{request: pending_request}
@@ -109,10 +172,7 @@ defmodule FauxBanker.AccountRequestsTest do
 
     @tag :positive
     test "should work and only once", %{request: pending_request} do
-      %AccountRequest{receipient_account: %BankAccount{code: code}} =
-        pending_request
-
-      params = string_params_for(:reject_request, %{account_code: code})
+      params = string_params_for(:reject_request, %{})
 
       assert {:ok, %AccountRequest{status: :rejected}} =
                Context.reject_request(pending_request, params)
@@ -125,6 +185,27 @@ defmodule FauxBanker.AccountRequestsTest do
     test "should fail safely", %{request: pending_request} do
       assert {:error, %Changeset{}} =
                Context.reject_request(pending_request, %{})
+    end
+
+    @tag :integration
+    test "should not change balance", %{request: pending_request} do
+      %AccountRequest{sender_account: sender_account} = pending_request
+
+      params = string_params_for(:reject_request, %{})
+
+      assert {:ok, request} = Context.reject_request(pending_request, params)
+
+      assert %AccountRequest{
+               status: :rejected,
+               sender_account: updated_sender_account
+             } =
+               request
+               |> Repo.preload([:sender_account],
+                 force: true
+               )
+
+      assert Decimal.cmp(updated_sender_account.balance, sender_account.balance) ==
+               :eq
     end
   end
 
