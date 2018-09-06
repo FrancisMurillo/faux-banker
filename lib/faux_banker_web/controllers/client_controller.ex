@@ -190,6 +190,8 @@ defmodule FauxBankerWeb.ClientController do
     if request = AccountRequests.get_request_by_code(code) do
       case AccountRequests.approve_request(request, params) do
         {:ok, %AccountRequest{code: request_code}} ->
+          Process.sleep(100)
+
           conn
           |> put_flash(
             :info,
@@ -236,6 +238,8 @@ defmodule FauxBankerWeb.ClientController do
     if request = AccountRequests.get_request_by_code(code) do
       case AccountRequests.reject_request(request, params) do
         {:ok, %AccountRequest{code: request_code}} ->
+          Process.sleep(100)
+
           conn
           |> put_flash(
             :info,

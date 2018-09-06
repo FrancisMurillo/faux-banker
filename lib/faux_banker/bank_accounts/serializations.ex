@@ -50,12 +50,19 @@ defimpl Commanded.Serialization.JsonDecoder,
 
   alias FauxBanker.BankAccounts.Accounts.Events.AmountTransferred, as: Event
 
-  def decode(%Event{amount: amount, balance: balance} = state),
-    do: %Event{
-      state
-      | amount: Decimal.new(amount),
-        balance: Decimal.new(balance)
-    }
+  def decode(
+        %Event{
+          amount: amount,
+          balance: balance,
+          previous_balance: previous_balance
+        } = state
+      ),
+      do: %Event{
+        state
+        | amount: Decimal.new(amount),
+          balance: Decimal.new(balance),
+          previous_balance: Decimal.new(previous_balance)
+      }
 end
 
 defimpl Commanded.Serialization.JsonDecoder,
@@ -66,12 +73,19 @@ defimpl Commanded.Serialization.JsonDecoder,
 
   alias FauxBanker.BankAccounts.Accounts.Events.AmountReceived, as: Event
 
-  def decode(%Event{amount: amount, balance: balance} = state),
-    do: %Event{
-      state
-      | amount: Decimal.new(amount),
-        balance: Decimal.new(balance)
-    }
+  def decode(
+        %Event{
+          amount: amount,
+          balance: balance,
+          previous_balance: previous_balance
+        } = state
+      ),
+      do: %Event{
+        state
+        | amount: Decimal.new(amount),
+          balance: Decimal.new(balance),
+          previous_balance: Decimal.new(previous_balance)
+      }
 end
 
 defimpl Commanded.Serialization.JsonDecoder,

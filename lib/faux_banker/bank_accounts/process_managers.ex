@@ -5,7 +5,7 @@ defmodule FauxBanker.BankAccounts.ProcessManagers do
     use Commanded.ProcessManagers.ProcessManager,
       name: "BankAccounts.TransferProcessManager",
       router: FauxBanker.Router,
-      consistency: :strong
+      consistency: :eventual
 
     alias FauxBanker.{Repo}
 
@@ -21,11 +21,11 @@ defmodule FauxBanker.BankAccounts.ProcessManagers do
       do: {:start, id}
 
     def error({:error, _failure}, _command, %{context: %{failures: failures}})
-        when failures >= 5,
+        when failures >= 3,
         do: {:skip, :continue_pending}
 
     def error({:error, _failure}, _command, %{context: context}),
-      do: {:retry, 500, Map.update(context, :failures, 1, &(&1 + 1))}
+      do: {:retry, 10, Map.update(context, :failures, 1, &(&1 + 1))}
 
     def handle(_state, %RequestApproved{id: id}) do
       if request = Repo.get(AccountRequest, id) do

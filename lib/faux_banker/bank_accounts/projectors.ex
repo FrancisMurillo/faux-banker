@@ -167,7 +167,6 @@ defmodule FauxBanker.BankAccounts.Projectors do
       })
       |> LogRepo.insert()
       |> case do
-        :ok -> nil
         {:ok, _log} -> nil
         error -> error
       end
@@ -197,7 +196,6 @@ defmodule FauxBanker.BankAccounts.Projectors do
       })
       |> LogRepo.insert()
       |> case do
-        :ok -> nil
         {:ok, _log} -> nil
         error -> error
       end
@@ -224,7 +222,7 @@ defmodule FauxBanker.BankAccounts.Projectors do
       })
       |> LogRepo.insert()
       |> case do
-        :ok -> nil
+        {:ok, _log} -> nil
         error -> error
       end
     end
@@ -233,11 +231,11 @@ defmodule FauxBanker.BankAccounts.Projectors do
           id: id,
           request_id: request_id,
           amount: amount,
-          balance: balance
+          balance: balance,
+          previous_balance: current_balance
         }) do
       if request = Repo.get(AccountRequest, request_id) do
-        %BankAccount{balance: current_balance, code: code} =
-          Repo.get!(BankAccount, id)
+        %BankAccount{code: code} = Repo.get!(BankAccount, id)
 
         %AccountRequest{receipient_reason: reason, code: request_code} = request
 
@@ -254,7 +252,6 @@ defmodule FauxBanker.BankAccounts.Projectors do
         })
         |> LogRepo.insert()
         |> case do
-          :ok -> nil
           {:ok, _log} -> nil
           error -> error
         end
@@ -267,13 +264,13 @@ defmodule FauxBanker.BankAccounts.Projectors do
           id: id,
           request_id: request_id,
           amount: amount,
-          balance: balance
+          balance: balance,
+          previous_balance: current_balance
         }) do
       if request = Repo.get(AccountRequest, request_id) do
         %AccountRequest{sender_reason: reason, code: request_code} = request
 
-        %BankAccount{balance: current_balance, code: code} =
-          Repo.get!(BankAccount, id)
+        %BankAccount{code: code} = Repo.get!(BankAccount, id)
 
         %Entity{}
         |> Entity.changeset(%{
@@ -288,7 +285,6 @@ defmodule FauxBanker.BankAccounts.Projectors do
         })
         |> LogRepo.insert()
         |> case do
-          :ok -> nil
           {:ok, _log} -> nil
           error -> error
         end

@@ -151,12 +151,12 @@ defmodule FauxBanker.BankAccounts.Accounts.Events do
   defmodule AmountTransferred do
     @moduledoc nil
     @derive [Poison.Encoder]
-    defstruct [:id, :request_id, :amount, :balance]
+    defstruct [:id, :request_id, :amount, :balance, :previous_balance]
   end
 
   defmodule AmountReceived do
     @moduledoc nil
     @derive [Poison.Encoder]
-    defstruct [:id, :request_id, :amount, :balance]
+    defstruct [:id, :request_id, :amount, :balance, :previous_balance]
   end
 end

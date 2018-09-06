@@ -122,15 +122,18 @@ defmodule FauxBanker.AccountRequestsTest do
 
       assert {:ok, request} = Context.approve_request(pending_request, params)
 
-      assert %AccountRequest{
-               status: :approved,
-               receipient_account: updated_receipient_account,
-               sender_account: updated_sender_account
-             } =
-               request
-               |> Repo.preload([:receipient_account, :sender_account],
-                 force: true
-               )
+      assert %AccountRequest{status: :approved} = request
+
+      Process.sleep(50)
+
+      %AccountRequest{
+        receipient_account: updated_receipient_account,
+        sender_account: updated_sender_account
+      } =
+        request
+        |> Repo.preload([:receipient_account, :sender_account],
+          force: true
+        )
 
       assert Decimal.cmp(updated_sender_account.balance, sender_account.balance) ==
                :gt
