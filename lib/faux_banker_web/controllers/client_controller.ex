@@ -169,7 +169,7 @@ defmodule FauxBankerWeb.ClientController do
 
   def approve_request_screen(conn, %{"code" => code}) do
     if request = AccountRequests.get_request_by_code(code) do
-      %AccountRequest{sender_id: id} = request
+      %AccountRequest{receipient_id: id} = request
 
       accounts = BankAccounts.list_accounts_by_client_id(id)
 

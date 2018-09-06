@@ -8,18 +8,19 @@ defmodule FauxBanker.BankAccountsTest do
   alias FauxBanker.{LogRepo, Router}
 
   alias FauxBanker.Accounts.User
-
-  alias FauxBanker.Clients, as: ClientContext
+  alias FauxBanker.AccountRequests.AccountRequest
+  alias FauxBanker.Clients
 
   alias FauxBanker.BankAccounts, as: Context
   alias Context.{BankAccount, AccountLog}
   alias Context.Accounts.Aggregates, as: AccountAggregates
+  alias Context.Accounts.Commands.{TransferAmount, ReceiveAmount}
 
   describe "Context.open_client_account/2" do
     setup do
       %User{code: code} = insert(:client_user, %{accounts: []})
 
-      %{client: ClientContext.get_client_by_code(code)}
+      %{client: Clients.get_client_by_code(code)}
     end
 
     @tag :positive
@@ -106,7 +107,7 @@ defmodule FauxBanker.BankAccountsTest do
     test "should log newly opened account" do
       %User{code: code} = insert(:client_user, %{accounts: []})
 
-      client = ClientContext.get_client_by_code(code)
+      client = Clients.get_client_by_code(code)
       params = string_params_for(:open_client_account, %{})
 
       assert {:ok, %BankAccount{code: account_code}} =
@@ -157,6 +158,72 @@ defmodule FauxBanker.BankAccountsTest do
 
       assert %AccountLog{} =
                LogRepo.get_by(AccountLog, code: code, event: "Amount Deposited")
+    end
+
+    @tag :positive
+    test "should log transferred amount" do
+      request = insert(:request, %{})
+
+      %AccountRequest{
+        id: request_id,
+        code: request_code,
+        receipient_account_id: receipient_account_id,
+        receipient_account: receipient_account
+      } = request
+
+      :ok =
+        AccountAggregates
+        |> struct(Map.from_struct(receipient_account))
+        |> Router.dispatch()
+
+      assert :ok =
+               %TransferAmount{
+                 id: receipient_account_id,
+                 request_id: request_id,
+                 amount: Decimal.new(1)
+               }
+               |> Router.dispatch()
+
+      Process.sleep(50)
+
+      assert %AccountLog{} =
+               LogRepo.get_by(AccountLog,
+                 request_code: request_code,
+                 event: "Amount Transferred"
+               )
+    end
+
+    @tag :positive
+    test "should log received amount" do
+      request = insert(:request, %{})
+
+      %AccountRequest{
+        id: request_id,
+        code: request_code,
+        sender_account_id: sender_account_id,
+        sender_account: sender_account
+      } = request
+
+      :ok =
+        AccountAggregates
+        |> struct(Map.from_struct(sender_account))
+        |> Router.dispatch()
+
+      assert :ok =
+               %ReceiveAmount{
+                 id: sender_account_id,
+                 request_id: request_id,
+                 amount: Decimal.new(1)
+               }
+               |> Router.dispatch()
+
+      Process.sleep(50)
+
+      assert %AccountLog{} =
+               LogRepo.get_by(AccountLog,
+                 request_code: request_code,
+                 event: "Amount Received"
+               )
     end
   end
 end

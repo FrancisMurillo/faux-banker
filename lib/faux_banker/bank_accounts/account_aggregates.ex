@@ -104,7 +104,7 @@ defmodule FauxBanker.BankAccounts.Accounts.Aggregates do
         request_id: request_id,
         amount: amount
       }),
-      do: %AmountTransferred{
+      do: %AmountReceived{
         id: id,
         request_id: request_id,
         amount: amount,
