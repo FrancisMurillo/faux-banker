@@ -39,7 +39,9 @@ config :faux_banker, FauxBanker.Repo,
 config :faux_banker, FauxBanker.LogRepo,
   adapter: Mongo.Ecto,
   database: "faux_log_dev",
-  hostname: "localhost"
+  hostname: "localhost",
+  pool_size: 10,
+  w: 0
 
 config :eventstore, EventStore.Storage,
   serializer: Commanded.Serialization.JsonSerializer,

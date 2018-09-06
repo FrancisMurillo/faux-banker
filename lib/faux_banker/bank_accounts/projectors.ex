@@ -167,6 +167,7 @@ defmodule FauxBanker.BankAccounts.Projectors do
       })
       |> LogRepo.insert()
       |> case do
+        :ok -> nil
         {:ok, _log} -> nil
         error -> error
       end
@@ -196,6 +197,7 @@ defmodule FauxBanker.BankAccounts.Projectors do
       })
       |> LogRepo.insert()
       |> case do
+        :ok -> nil
         {:ok, _log} -> nil
         error -> error
       end
@@ -222,7 +224,7 @@ defmodule FauxBanker.BankAccounts.Projectors do
       })
       |> LogRepo.insert()
       |> case do
-        {:ok, _log} -> nil
+        :ok -> nil
         error -> error
       end
     end
@@ -252,6 +254,7 @@ defmodule FauxBanker.BankAccounts.Projectors do
         })
         |> LogRepo.insert()
         |> case do
+          :ok -> nil
           {:ok, _log} -> nil
           error -> error
         end
@@ -285,6 +288,7 @@ defmodule FauxBanker.BankAccounts.Projectors do
         })
         |> LogRepo.insert()
         |> case do
+          :ok -> nil
           {:ok, _log} -> nil
           error -> error
         end
