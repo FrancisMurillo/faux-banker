@@ -47,10 +47,8 @@ defmodule FauxBanker.Mixfile do
       {:phoenix_html, "~> 2.10"},
       {:phoenix_live_reload, "~> 1.0", only: :dev},
       {:timex, "~> 3.0"},
-      {:toml, "~> 0.1.0"},
       {:ueberauth, "~> 0.4"},
       {:ueberauth_identity, "~> 0.2"},
-      {:ueberauth_google, "~> 0.7"},
       {:uuid, "~> 1.1"},
       {:gettext, "~> 0.11"},
       {:cowboy, "~> 1.0"}

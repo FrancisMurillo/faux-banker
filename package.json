@@ -27,7 +27,6 @@
       ],
       "post-commit": [],
       "pre-push": [
-        "mix credo --strict",
         "mix test"
       ],
       "post-checkout": [],
