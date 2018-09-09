@@ -72,6 +72,26 @@ defmodule FauxBanker.BankAccountsTest do
                  amount: balance + 1
                })
     end
+
+    @tag :concurrency
+    test "should fail with concurrent requests", %{account: account} do
+      %BankAccount{balance: raw_balance} = account
+      balance = Decimal.to_integer(raw_balance)
+
+      %{error: :constraint_error, ok: %BankAccount{}} =
+        1
+        |> Range.new(3)
+        |> Enum.map(fn _ ->
+          Task.async(fn ->
+            Context.withdraw_from_account(
+              account,
+              %{amount: balance}
+            )
+          end)
+        end)
+        |> Enum.map(&Task.await/1)
+        |> Map.new()
+    end
   end
 
   describe "Context.deposit_to_account/2" do
