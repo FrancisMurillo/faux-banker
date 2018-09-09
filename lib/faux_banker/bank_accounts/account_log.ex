@@ -31,8 +31,8 @@ defmodule FauxBanker.BankAccounts.AccountLog do
   ]
 
   @doc false
-  def changeset(%Entity{} = account, attrs) do
-    account
+  def changeset(%Entity{} = log, attrs) do
+    log
     |> cast(attrs, @fields)
     |> validate_required(
       @fields --

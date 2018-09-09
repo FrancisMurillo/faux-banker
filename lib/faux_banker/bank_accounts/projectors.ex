@@ -137,7 +137,7 @@ defmodule FauxBanker.BankAccounts.Projectors do
         do: {:skip, :continue_pending}
 
     def error({:error, _failure}, _command, %{context: context}),
-      do: {:retry, 100, Map.update(context, :failures, 1, &(&1 + 1))}
+      do: {:retry, 10, Map.update(context, :failures, 1, &(&1 + 1))}
 
     def interested?(%AccountOpened{id: id}),
       do: {:start, id}
@@ -229,59 +229,67 @@ defmodule FauxBanker.BankAccounts.Projectors do
 
     def handle(_state, %AmountTransferred{
           id: id,
+          request_id: request_id,
           amount: amount,
-          balance: balance
+          balance: balance,
+          previous_balance: current_balance
         }) do
-      %BankAccount{balance: current_balance, code: code} =
-        Repo.get!(BankAccount, id)
+      if request = Repo.get(AccountRequest, request_id) do
+        %BankAccount{code: code} = Repo.get!(BankAccount, id)
 
-      %AccountRequest{receipient_reason: reason, code: request_code} =
-        Repo.get!(AccountRequest, id)
+        %AccountRequest{receipient_reason: reason, code: request_code} = request
 
-      %Entity{}
-      |> Entity.changeset(%{
-        event: "Amount Transferred",
-        code: code,
-        request_code: request_code,
-        description: reason,
-        amount: Decimal.to_float(amount),
-        current_balance: Decimal.to_float(current_balance),
-        next_balance: Decimal.to_float(balance),
-        logged_at: DateTime.utc_now()
-      })
-      |> LogRepo.insert()
-      |> case do
-        {:ok, _log} -> nil
-        error -> error
+        %Entity{}
+        |> Entity.changeset(%{
+          event: "Amount Transferred",
+          code: code,
+          request_code: request_code,
+          description: reason,
+          amount: Decimal.to_float(amount),
+          current_balance: Decimal.to_float(current_balance),
+          next_balance: Decimal.to_float(balance),
+          logged_at: DateTime.utc_now()
+        })
+        |> LogRepo.insert()
+        |> case do
+          {:ok, _log} -> nil
+          error -> error
+        end
+      else
+        {:error, :request_not_found}
       end
     end
 
     def handle(_state, %AmountReceived{
           id: id,
+          request_id: request_id,
           amount: amount,
-          balance: balance
+          balance: balance,
+          previous_balance: current_balance
         }) do
-      %BankAccount{balance: current_balance, code: code} =
-        Repo.get!(BankAccount, id)
+      if request = Repo.get(AccountRequest, request_id) do
+        %AccountRequest{sender_reason: reason, code: request_code} = request
 
-      %AccountRequest{sender_reason: reason, code: request_code} =
-        Repo.get!(AccountRequest, id)
+        %BankAccount{code: code} = Repo.get!(BankAccount, id)
 
-      %Entity{}
-      |> Entity.changeset(%{
-        event: "Amount Received",
-        code: code,
-        request_code: request_code,
-        description: reason,
-        amount: Decimal.to_float(amount),
-        current_balance: Decimal.to_float(current_balance),
-        next_balance: Decimal.to_float(balance),
-        logged_at: DateTime.utc_now()
-      })
-      |> LogRepo.insert()
-      |> case do
-        {:ok, _log} -> nil
-        error -> error
+        %Entity{}
+        |> Entity.changeset(%{
+          event: "Amount Received",
+          code: code,
+          request_code: request_code,
+          description: reason,
+          amount: Decimal.to_float(amount),
+          current_balance: Decimal.to_float(current_balance),
+          next_balance: Decimal.to_float(balance),
+          logged_at: DateTime.utc_now()
+        })
+        |> LogRepo.insert()
+        |> case do
+          {:ok, _log} -> nil
+          error -> error
+        end
+      else
+        {:error, :request_not_found}
       end
     end
   end

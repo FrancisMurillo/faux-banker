@@ -94,6 +94,7 @@ defmodule FauxBanker.BankAccounts.Accounts.Aggregates do
         id: id,
         request_id: request_id,
         amount: amount,
+        previous_balance: balance,
         balance: Decimal.sub(balance, amount)
       }
     end
@@ -104,10 +105,11 @@ defmodule FauxBanker.BankAccounts.Accounts.Aggregates do
         request_id: request_id,
         amount: amount
       }),
-      do: %AmountTransferred{
+      do: %AmountReceived{
         id: id,
         request_id: request_id,
         amount: amount,
+        previous_balance: balance,
         balance: Decimal.add(balance, amount)
       }
 

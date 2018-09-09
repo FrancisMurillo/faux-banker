@@ -5,7 +5,7 @@ defmodule FauxBanker.BankAccounts.ProcessManagers do
     use Commanded.ProcessManagers.ProcessManager,
       name: "BankAccounts.TransferProcessManager",
       router: FauxBanker.Router,
-      consistency: :strong
+      consistency: :eventual
 
     alias FauxBanker.{Repo}
 
@@ -25,19 +25,27 @@ defmodule FauxBanker.BankAccounts.ProcessManagers do
         do: {:skip, :continue_pending}
 
     def error({:error, _failure}, _command, %{context: context}),
-      do: {:retry, 100, Map.update(context, :failures, 1, &(&1 + 1))}
+      do: {:retry, 10, Map.update(context, :failures, 1, &(&1 + 1))}
 
     def handle(_state, %RequestApproved{id: id}) do
-      %AccountRequest{
-        amount: amount,
-        sender_account_id: receiver_id,
-        receipient_account_id: giver_id
-      } = Repo.get!(AccountRequest, id)
+      if request = Repo.get(AccountRequest, id) do
+        %AccountRequest{
+          amount: amount,
+          sender_account_id: receiver_id,
+          receipient_account_id: giver_id
+        } = request
 
-      [
-        %TransferAmount{id: giver_id, request_id: id, amount: amount},
-        %ReceiveAmount{id: receiver_id, request_id: id, amount: amount}
-      ]
+        if is_nil(giver_id) do
+          {:error, :request_not_found}
+        else
+          [
+            %TransferAmount{id: giver_id, request_id: id, amount: amount},
+            %ReceiveAmount{id: receiver_id, request_id: id, amount: amount}
+          ]
+        end
+      else
+        {:error, :request_not_found}
+      end
     end
   end
 end

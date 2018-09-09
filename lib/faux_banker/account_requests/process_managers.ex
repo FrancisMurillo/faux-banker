@@ -38,7 +38,7 @@ defmodule FauxBanker.AccountRequests.ProcessManagers do
         do: {:skip, :continue_pending}
 
     def error({:error, _failure}, _command, %{context: context}),
-      do: {:retry, 100, Map.update(context, :failures, 1, &(&1 + 1))}
+      do: {:retry, 10, Map.update(context, :failures, 1, &(&1 + 1))}
 
     def request_money_email(%AccountRequest{} = request) do
       %AccountRequest{

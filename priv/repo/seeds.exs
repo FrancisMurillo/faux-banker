@@ -10,7 +10,11 @@ alias FauxBanker.BankAccounts.Accounts.Aggregates, as: AccountAggregates
 
 {:ok, _} = Application.ensure_all_started(:faux_banker)
 
-Mongo.Ecto.truncate(LogRepo)
+try do
+  Mongo.Ecto.truncate(LogRepo)
+rescue
+  _ -> nil
+end
 
 :user
 |> insert(%{
